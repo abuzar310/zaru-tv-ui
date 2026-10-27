@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
@@ -96,6 +98,79 @@ public class HomeKeyService extends AccessibilityService {
         settingsPanel = config.settingsKeyPanel;
         appKeys = RemoteKeys.parseAppKeys(config.appKeys);
         Log.d(TAG, "connected, " + appKeys.size() + " app keys");
+        followVolumeKeys();
+    }
+
+    /** A held volume button repeats after HOLD_DELAY_MS, one step every HOLD_STEP_MS, until it is let go. */
+    private static final long HOLD_DELAY_MS = 400, HOLD_STEP_MS = 90, HOLD_MAX_MS = 15000;
+    private int heldKey;               // KEYCODE_VOLUME_UP/DOWN while that button is down, else 0
+    private long heldSince;
+    private volatile boolean following;
+    private volatile Process keyLog;
+    private final Runnable holdStep = new Runnable() {
+        @Override public void run() {
+            if (heldKey == 0 || audio == null || ui == null) return;
+            if (SystemClock.uptimeMillis() - heldSince > HOLD_MAX_MS) { heldKey = 0; return; }   // missed the release
+            try {
+                // Exactly one step each time, so the HUD counts 21, 22, 23 (a RAISE can move this TV by two).
+                int max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                int cur = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+                int next = Math.max(0, Math.min(max, cur + (heldKey == KeyEvent.KEYCODE_VOLUME_UP ? 1 : -1)));
+                if (next != cur) audio.setStreamVolume(AudioManager.STREAM_MUSIC, next, 0);
+            } catch (Throwable ignored) {}
+            ui.postDelayed(this, HOLD_STEP_MS);
+        }
+    };
+
+    /**
+     * Held volume buttons on a Bluetooth remote move one step only: the remote sends a press and a release, and
+     * while any accessibility key filter runs (this service, his Button Remap) Android TV never makes its usual
+     * repeats for volume keys. No service ever sees those keys, but the system logs each one (on this TCL,
+     * "handleKeyBeforeQueueing ... KEYCODE_VOLUME_UP"), so follow that log and repeat while the button is down.
+     * Needs READ_LOGS (pm grant); without it logcat shows only our own lines and nothing happens.
+     */
+    private void followVolumeKeys() {
+        if (following) return;
+        following = true;
+        Thread t = new Thread(new Runnable() {
+            @Override public void run() {
+                while (following) {
+                    try {
+                        Process p = Runtime.getRuntime().exec(new String[] {"logcat", "-T", "1", "WindowManager:D", "*:S"});
+                        keyLog = p;
+                        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                        for (String line; following && (line = in.readLine()) != null; ) {
+                            if (!line.contains("handleKeyBeforeQueueing")) continue;
+                            final int key = line.contains("KEYCODE_VOLUME_UP,") ? KeyEvent.KEYCODE_VOLUME_UP
+                                    : line.contains("KEYCODE_VOLUME_DOWN,") ? KeyEvent.KEYCODE_VOLUME_DOWN : 0;
+                            if (key == 0) continue;
+                            final boolean down = line.contains("action=ACTION_DOWN");
+                            final boolean repeat = !line.contains("repeatCount=0");
+                            if (ui != null) ui.post(new Runnable() {
+                                @Override public void run() { onVolumeKey(key, down, repeat); }
+                            });
+                        }
+                        p.destroy();
+                    } catch (Throwable ignored) {}
+                    try { Thread.sleep(2000); } catch (InterruptedException e) { return; }
+                }
+            }
+        }, "volume-keys");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** Starts the repeat on a press; a release, or the remote repeating by itself (IR), stops it. */
+    private void onVolumeKey(int key, boolean down, boolean repeat) {
+        if (ui == null) return;
+        ui.removeCallbacks(holdStep);
+        if (!down || repeat || heldKey == key) {
+            heldKey = 0;
+            return;
+        }
+        heldKey = key;
+        heldSince = SystemClock.uptimeMillis();
+        ui.postDelayed(holdStep, HOLD_DELAY_MS);
     }
 
     private boolean isSettingsKey(KeyEvent event) {
@@ -165,6 +240,10 @@ public class HomeKeyService extends AccessibilityService {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        following = false;
+        heldKey = 0;
+        try { if (keyLog != null) keyLog.destroy(); } catch (Throwable ignored) {}
+        try { if (ui != null) ui.removeCallbacks(holdStep); } catch (Throwable ignored) {}
         try { unregisterReceiver(volumeWatch); } catch (Throwable ignored) {}
         try { if (ui != null) ui.removeCallbacks(hideHud); } catch (Throwable ignored) {}
         try { if (windows != null && hud != null) windows.removeView(hud); } catch (Throwable ignored) {}

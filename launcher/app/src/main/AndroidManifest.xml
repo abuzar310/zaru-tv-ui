@@ -18,6 +18,8 @@
         tools:ignore="CoarseFineLocation" />
     <!-- Cinematic shelf: the films and shows apps publish as home screen cards (ShowArt). Granted with pm grant. -->
     <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
+    <!-- Lets HomeKeyService follow the system's key log, to repeat a held volume button (granted over adb). -->
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->

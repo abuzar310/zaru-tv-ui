@@ -33,6 +33,12 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
   in a brass circle) on its dark left side. One aerial clip plays between photos.
 
 ### Fixed
+- Holding a volume button keeps moving the volume, one step at a time, until it is let go. A Bluetooth
+  remote sends only a press and a release, and while an accessibility key filter runs Android TV makes
+  no repeats for volume keys, so the launcher follows the system's key log (READ_LOGS, granted over adb)
+  and repeats every ~90 ms after a 0.4 s hold.
+- The remote's gear opens the Control Center panel over the app you are in, with nothing dimmed or
+  blurred behind it, instead of throwing you out to Home (the tvOS launcher's gear remap is dropped once).
 - The volume HUD now appears for the real remote. Android TV hands the volume keys to the system before
   any accessibility service sees them, so the HUD follows volume changes instead of keys, and lies over
   the system's volume bar until that bar has gone.
