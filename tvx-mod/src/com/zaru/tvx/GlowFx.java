@@ -52,7 +52,7 @@ final class GlowFx {
     /** Focus moved: if it landed on an app tile we know, glow that app's colour for a few seconds. */
     static void onFocus(Activity a, View newV) {
         try {
-            int c = brandOf(a, newV);
+            int c = brandColorOf(a, newV);
             if (c != 0 && glow != null) {
                 glow.setGlow(c);
                 brandUntil = System.currentTimeMillis() + 5000L;
@@ -60,7 +60,8 @@ final class GlowFx {
         } catch (Throwable ignored) {}
     }
 
-    private static int brandOf(Activity a, View v) {
+    /** The brand colour (no alpha) for the app a focused tile represents, or 0 if we don't know it. */
+    static int brandColorOf(Activity a, View v) {
         if (v == null) return 0;
         if (nameId == 0) nameId = a.getResources().getIdentifier("name", "id", a.getPackageName());
         CharSequence label = null;

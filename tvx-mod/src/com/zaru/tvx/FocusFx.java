@@ -16,9 +16,9 @@ final class FocusFx {
 
     private FocusFx() {}
 
-    static void onFocus(View decor, View oldV, View newV) {
+    static void onFocus(android.app.Activity a, View decor, View oldV, View newV) {
         if (oldV != null && isTile(decor, oldV)) settle(oldV);
-        if (newV != null && isTile(decor, newV)) lift(newV);
+        if (newV != null && isTile(decor, newV)) lift(a, newV);
     }
 
     private static boolean isTile(View decor, View v) {
@@ -63,10 +63,20 @@ final class FocusFx {
                 .setDuration(190).setInterpolator(new DecelerateInterpolator(2f)).start();
     }
 
-    private static void lift(View v) {
+    private static void lift(android.app.Activity a, View v) {
         unclip(v, 3);
         v.setPivotX(v.getWidth() / 2f);
         v.setPivotY(v.getHeight() / 2f);
+        // Tint the lift's shadow with the app's brand colour (a soft white otherwise) so the focused
+        // tile casts a glow in its own colour.
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 28) {
+                int c = GlowFx.brandColorOf(a, v);
+                int glow = (c != 0 ? c : 0xFFFFFF) | 0xFF000000;
+                v.setOutlineSpotShadowColor(glow);
+                v.setOutlineAmbientShadowColor(glow);
+            }
+        } catch (Throwable ignored) {}
         v.animate().cancel();
         v.animate()
                 .scaleX(1.07f).scaleY(1.07f)

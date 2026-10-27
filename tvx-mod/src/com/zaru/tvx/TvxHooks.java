@@ -29,7 +29,7 @@ public final class TvxHooks {
             decor.getViewTreeObserver().addOnGlobalFocusChangeListener(
                 new ViewTreeObserver.OnGlobalFocusChangeListener() {
                     @Override public void onGlobalFocusChanged(View oldV, View newV) {
-                        try { FocusFx.onFocus(decor, oldV, newV); } catch (Throwable ignored) {}
+                        try { FocusFx.onFocus(a, decor, oldV, newV); } catch (Throwable ignored) {}
                         try { GlowFx.onFocus(a, newV); } catch (Throwable ignored) {}
                         try { CcExtras.ensure(a, decor); } catch (Throwable ignored) {}
                         try { SleepTimer.ensure(a, decor); } catch (Throwable ignored) {}
