@@ -39,12 +39,6 @@ public class HomeKeyService extends AccessibilityService {
     static final String ACTION_QUIET = "com.gathin.tvhome.VOLUME_HUD_QUIET";
     /** Android TV's own volume bar stays about 3 s after the last change; the HUD outlasts it to keep it covered. */
     private static final long HUD_MS = 3100;
-    /**
-     * The TV moves its 0..100 media volume by 1 per press, which is too fine to hear. A press is topped up to
-     * STEP_TAP and each repeat of a held button to STEP_HELD; a step within HELD_GAP_MS of the last is a repeat.
-     */
-    private static final int STEP_TAP = 5, STEP_HELD = 2;
-    private static final long HELD_GAP_MS = 220;
 
     /** Remote buttons that should open Settings (config.xml, settings_key_scancodes and settings_key_keycodes). */
     private int[] settingsScancodes = new int[0];
@@ -58,8 +52,7 @@ public class HomeKeyService extends AccessibilityService {
     private WindowManager windows;
     private Handler ui;
     private VolumeHud hud;
-    private long quietUntil, lastStepAt;
-    private int ownTarget = -1;   // the volume we set ourselves, so its broadcast is not topped up again
+    private long quietUntil;
     private final Runnable hideHud = new Runnable() {
         @Override public void run() {
             if (hud == null) return;
@@ -76,30 +69,10 @@ public class HomeKeyService extends AccessibilityService {
             }
             int stream = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", AudioManager.STREAM_MUSIC);
             if (stream != AudioManager.STREAM_MUSIC || SystemClock.uptimeMillis() < quietUntil) return;
-            if ("android.media.VOLUME_CHANGED_ACTION".equals(i.getAction())) {
-                topUp(i.getIntExtra("android.media.EXTRA_PREV_VOLUME_STREAM_VALUE", -1),
-                        i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_VALUE", -1));
-            }
             showVolume();
             scheduleHideVolume();
         }
     };
-
-    /** Turns the TV's own one-step change (a press or a held repeat) into a bigger one; leaves anything else. */
-    private void topUp(int prev, int cur) {
-        try {
-            if (cur == ownTarget) { ownTarget = -1; return; }   // our own change coming back
-            if (audio == null || prev < 0 || cur < 0 || Math.abs(cur - prev) != 1) return;
-            long now = SystemClock.uptimeMillis();
-            int step = now - lastStepAt < HELD_GAP_MS ? STEP_HELD : STEP_TAP;
-            lastStepAt = now;
-            int max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            int target = Math.max(0, Math.min(max, prev + (cur > prev ? step : -step)));
-            if (target == cur) return;
-            ownTarget = target;
-            audio.setStreamVolume(AudioManager.STREAM_MUSIC, target, 0);
-        } catch (Throwable ignored) {}
-    }
 
     @Override
     protected void onServiceConnected() {
