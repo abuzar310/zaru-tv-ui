@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Don't have time to browse?" (BrowseDeckActivity): the page under the vibe home's dock. One film or show at a
+     time from the cards the TV's apps publish, as the top of a little deck, over its own picture in black and white.
+     Left is nope, Right or OK is yes (opens it in its app), Up goes back to the dock, Down to every app. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF07080C"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/deckBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0"
+        android:importantForAccessibility="no" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C2000000" />
+
+    <com.gathin.tvhome.GlowView
+        android:id="@+id/deckGlow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/deckHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="44dp"
+        android:text="@string/deck_heading"
+        android:textColor="#E6FFFFFF"
+        android:textSize="24sp"
+        android:fontFamily="@font/outfit_regular"
+        android:includeFontPadding="false" />
+
+    <!-- The deck: two cards peeking out behind the one on top. -->
+    <FrameLayout
+        android:id="@+id/deckStack"
+        android:layout_width="448dp"
+        android:layout_height="252dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="-6dp"
+        android:clipChildren="false">
+
+        <View
+            android:id="@+id/deckBack2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.35"
+            android:rotation="5"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:background="@drawable/deck_card_bg" />
+
+        <View
+            android:id="@+id/deckBack1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:rotation="-3"
+            android:scaleX="0.95"
+            android:scaleY="0.95"
+            android:background="@drawable/deck_card_bg" />
+
+        <ImageView
+            android:id="@+id/deckCard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/deck_card_bg"
+            android:elevation="18dp"
+            android:importantForAccessibility="no" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="48dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/deckTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="640dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#FFFFFFFF"
+            android:textSize="22sp"
+            android:fontFamily="@font/outfit_medium" />
+
+        <TextView
+            android:id="@+id/deckApp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#A6FFFFFF"
+            android:textSize="14sp"
+            android:fontFamily="@font/outfit_regular" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/deckNope"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="88dp"
+        android:text="@string/deck_nope"
+        android:textColor="#99FFFFFF"
+        android:textSize="18sp"
+        android:fontFamily="@font/outfit_regular" />
+
+    <TextView
+        android:id="@+id/deckYes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="88dp"
+        android:text="@string/deck_yes"
+        android:textColor="#99FFFFFF"
+        android:textSize="18sp"
+        android:fontFamily="@font/outfit_regular" />
+
+    <TextView
+        android:id="@+id/deckEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:maxWidth="560dp"
+        android:gravity="center"
+        android:text="@string/deck_empty"
+        android:textColor="#CCFFFFFF"
+        android:textSize="18sp"
+        android:fontFamily="@font/outfit_regular"
+        android:visibility="gone" />
+</FrameLayout>

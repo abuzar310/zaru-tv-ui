@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The vibe home (VibeHomeActivity), to the "can't stop vibecoding my TV" breakdown: a full-bleed black-and-white
+     picture, the focused app's glow, a thin clock with the weather, three outline icons, one line for the focused
+     app and a dock of white logos. Outfit throughout; no tiles, no band, no blur, no video. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/vibeRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF07080C"
+    android:clipChildren="false">
+
+    <!-- H, wallpaper: two pictures so a new one can fade over the last. Black and white is set in code. -->
+    <ImageView
+        android:id="@+id/vibeWallA"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0"
+        android:importantForAccessibility="no" />
+
+    <ImageView
+        android:id="@+id/vibeWallB"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0"
+        android:importantForAccessibility="no" />
+
+    <!-- The wallpaper's shade: a light one under the clock, and from 45% of the height down to the dock. -->
+    <View
+        android:id="@+id/vibeShade"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- E, ambient glow in the focused app's colour. -->
+    <com.gathin.tvhome.GlowView
+        android:id="@+id/vibeGlow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- A clock and B weather: 56dp from the left, 32dp from the top. -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextClock
+            android:id="@+id/vibeClock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="h:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="#FFFFFFFF"
+            android:textSize="42sp"
+            android:fontFamily="@font/outfit_extralight"
+            android:includeFontPadding="false" />
+
+        <ImageView
+            android:id="@+id/vibeWxIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="22dp"
+            android:alpha="0.85"
+            android:visibility="gone"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/vibeWxTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="#D9FFFFFF"
+            android:textSize="20sp"
+            android:fontFamily="@font/outfit_light"
+            android:includeFontPadding="false" />
+    </LinearLayout>
+
+    <!-- C top icons: Wi-Fi, Inputs, Settings in 40dp boxes, 12dp apart, 56dp from the right, 40dp from the top. -->
+    <LinearLayout
+        android:id="@+id/vibeTopIcons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="56dp"
+        android:layout_marginTop="40dp"
+        android:clipChildren="false"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/vibeWifi"
+            style="@style/VibeTopIcon"
+            android:contentDescription="@string/wifi"
+            android:src="@drawable/ic_line_wifi" />
+
+        <ImageView
+            android:id="@+id/vibeInputs"
+            style="@style/VibeTopIcon"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/inputs"
+            android:src="@drawable/ic_line_input" />
+
+        <ImageView
+            android:id="@+id/vibeSettings"
+            style="@style/VibeTopIcon"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/settings"
+            android:src="@drawable/ic_line_settings" />
+    </LinearLayout>
+
+    <!-- D tagline 14dp above the dock, 56dp in; then the dock: 146dp cells, 42dp side padding, no tiles, no band. -->
+    <LinearLayout
+        android:id="@+id/vibeBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingBottom="22dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/vibeTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginEnd="56dp"
+            android:layout_marginBottom="14dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#F2FFFFFF"
+            android:textSize="36sp"
+            android:fontFamily="@font/outfit_light"
+            android:includeFontPadding="false"
+            android:shadowColor="#80000000"
+            android:shadowRadius="16" />
+
+        <LinearLayout
+            android:id="@+id/vibeDock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="42dp"
+            android:paddingEnd="42dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal" />
+    </LinearLayout>
+</FrameLayout>

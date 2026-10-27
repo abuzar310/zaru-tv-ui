@@ -1,0 +1,22 @@
+# Build outputs
+build/
+.gradle/
+out/
+tvx-out/
+tvx-dex/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+local.properties
+.idea/
+*.iml
+# Secrets / keystores — never commit
+*.keystore
+*.jks
+*.env
+token/
+# OS
+.DS_Store
+Thumbs.db

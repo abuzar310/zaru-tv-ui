@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A browse deck card: the picture's rounded frame (its outline clips the picture) with a faint rim. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#FF15171D" />
+    <stroke android:width="1dp" android:color="#33FFFFFF" />
+    <corners android:radius="22dp" />
+</shape>
