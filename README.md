@@ -1,5 +1,11 @@
 # Zaru TV — Apple-TV-style makeover for a TCL Google TV
 
+![platform](https://img.shields.io/badge/platform-Android%20TV%2012-3ddc84?logo=android&logoColor=white)
+![minSdk](https://img.shields.io/badge/minSdk-26-blue)
+![language](https://img.shields.io/badge/Java-plain%2C%20no%20AndroidX%20in%20tvx-orange)
+![license](https://img.shields.io/badge/license-MIT-green)
+![status](https://img.shields.io/badge/status-running%20on%20my%20TV-brightgreen)
+
 A personal project that turns a budget **TCL G10 (Google TV 12, 1 GB RAM)** into something that
 feels like an Apple TV: a cinematic home screen, a real Control Center, fluid focus animation, an
 ambient glow that reacts to what's on screen, and an aerial video screensaver.
