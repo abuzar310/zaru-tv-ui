@@ -4,8 +4,11 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.service.dreams.DreamService;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.VideoView;
 
 /**
@@ -32,6 +35,34 @@ public class AerialDreamService extends DreamService {
         root.setBackgroundColor(Color.BLACK);
         root.addView(vv, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+        // A soft clock over the aerial, like Apple's — the StandBy clock you like, on top of the video.
+        float d = getResources().getDisplayMetrics().density;
+        LinearLayout clockBox = new LinearLayout(this);
+        clockBox.setOrientation(LinearLayout.VERTICAL);
+        TextClock time = new TextClock(this);
+        time.setFormat12Hour("h:mm");
+        time.setFormat24Hour("H:mm");
+        time.setTextColor(0xFFFFFFFF);
+        time.setTextSize(TypedValue.COMPLEX_UNIT_SP, 76);
+        time.setShadowLayer(18f, 0f, 2f, 0xB3000000);
+        time.setIncludeFontPadding(false);
+        try { time.setTypeface(getResources().getFont(R.font.outfit_extralight)); } catch (Throwable ignored) {}
+        TextClock date = new TextClock(this);
+        date.setFormat12Hour("EEEE, MMMM d");
+        date.setFormat24Hour("EEEE, MMMM d");
+        date.setTextColor(0xCCFFFFFF);
+        date.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        date.setShadowLayer(12f, 0f, 1f, 0xB3000000);
+        try { date.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
+        clockBox.addView(time);
+        clockBox.addView(date);
+        FrameLayout.LayoutParams clp = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM | Gravity.START);
+        clp.setMargins((int) (72 * d), 0, 0, (int) (60 * d));
+        root.addView(clockBox, clp);
+
         setContentView(root);
 
         vv.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.aerial_loop));
