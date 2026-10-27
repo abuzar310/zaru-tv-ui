@@ -24,6 +24,9 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
   button below, and **press-and-hold** ramping (accessibility overlay).
 - **Aerial video screensaver** — muted, looping, licence-clean drone clips that dissolve through
   black between shots, with a soft clock, date and live weather (condition icon + today's high/low).
+- **Photo screensaver, StandBy-style** — your own photos open the screensaver: the photo on the right
+  with a slow push-in, and a big brushed-brass clock, the date, the weather and a month calendar (today
+  in a brass circle) on its dark left side. One aerial clip plays between photos.
 
 ### Fixed
 - The tvx hooks re-attach when the launcher recreates its window (it does so at the dark-mode flip at

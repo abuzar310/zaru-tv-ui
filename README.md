@@ -42,8 +42,9 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 - **iPhone-style volume HUD** — a vertical capsule that fills white from the bottom, with a speaker
   button below, shown by an accessibility overlay with **press-and-hold** ramping (replacing the
   stock one-step-per-press volume bar).
-- **Aerial video screensaver** — muted, looping, licence-clean drone clips with a soft clock, date
-  and live weather.
+- **Photo + aerial screensaver** — your own photos StandBy-style (the photo on the right; a big brass
+  clock, the date, the weather and a month calendar on the left), with a muted drone clip between them
+  and every change dissolving through black. See [docs/SCREENSAVER.md](docs/SCREENSAVER.md).
 
 ## Layout
 
