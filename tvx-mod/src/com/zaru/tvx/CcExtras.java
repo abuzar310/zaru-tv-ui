@@ -3,6 +3,7 @@ package com.zaru.tvx;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
@@ -51,6 +52,12 @@ final class CcExtras {
                 sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override public void onProgressChanged(SeekBar s, int p, boolean fromUser) {
                         if (fromUser) {
+                            // The launcher's volume HUD follows every volume change; tell it this one is the
+                            // slider, so it does not pop up over the Control Center while you drag.
+                            try {
+                                s.getContext().sendBroadcast(new Intent("com.gathin.tvhome.VOLUME_HUD_QUIET")
+                                        .setPackage("com.gathin.tvhome"));
+                            } catch (Throwable ignored) {}
                             try { am.setStreamVolume(AudioManager.STREAM_MUSIC, Math.max(0, Math.min(max, p)), 0); }
                             catch (Throwable ignored) {}
                         }
