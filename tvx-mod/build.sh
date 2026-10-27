@@ -11,7 +11,7 @@ mkdir -p build
 
 echo "[1/5] compile tvx -> dex"
 rm -rf tvx-out tvx-dex && mkdir -p tvx-out tvx-dex
-"$JDK/bin/javac" -source 8 -target 8 -cp "$AJAR" -d tvx-out $(find tvx-src -name '*.java') 2>/dev/null
+"$JDK/bin/javac" -encoding UTF-8 -source 8 -target 8 -cp "$AJAR" -d tvx-out $(find tvx-src -name '*.java') 2>/dev/null
 "$JDK/bin/java" -cp "$BT/lib/d8.jar" com.android.tools.r8.D8 --min-api 29 --output tvx-dex --lib "$AJAR" $(find tvx-out -name '*.class')
 
 echo "[2/5] apktool build"

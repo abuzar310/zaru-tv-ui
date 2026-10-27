@@ -25,6 +25,9 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
   volume bar while that is up (accessibility overlay).
 - **Aerial video screensaver** — muted, looping, licence-clean drone clips that dissolve through
   black between shots, with a soft clock, date and live weather (condition icon + today's high/low).
+- **StandBy in the house design** — the launcher's StandBy (the sleep timer's screen and *Preview
+  StandBy*) shows the saved Background picture with the brass clock, date, weather and gold calendar,
+  matching the screensaver.
 - **Photo screensaver, StandBy-style** — your own photos open the screensaver: the photo on the right
   with a slow push-in, and a big brushed-brass clock, the date, the weather and a month calendar (today
   in a brass circle) on its dark left side. One aerial clip plays between photos.

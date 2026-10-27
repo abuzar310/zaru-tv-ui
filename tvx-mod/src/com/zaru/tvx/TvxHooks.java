@@ -54,6 +54,16 @@ public final class TvxHooks {
         } catch (Throwable ignored) {}
     }
 
+    /** StandBy in the house design; called at the end of StandByActivity.onCreate. */
+    public static void standby(Activity a) {
+        try { StandByHouse.show(a); } catch (Throwable ignored) {}
+    }
+
+    /** The same for ClockDream, his StandBy-as-screensaver; called at the end of its onAttachedToWindow. */
+    public static void standbyDream(android.service.dreams.DreamService d) {
+        try { StandByHouse.show(d); } catch (Throwable ignored) {}
+    }
+
     /** Apply the preferences the owner asked for, once, without fighting later manual changes. */
     private static void seedSettings(Activity a) {
         try {
