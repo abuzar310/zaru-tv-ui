@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 /**
@@ -21,6 +22,12 @@ import android.widget.VideoView;
 public class AerialDreamService extends DreamService {
 
     private VideoView video;
+    private final int[] clips = { R.raw.aerial_loop, R.raw.aerial_loop2, R.raw.aerial_loop3 };
+    private int clipIdx;
+
+    private Uri clipUri(int resId) {
+        return Uri.parse("android.resource://" + getPackageName() + "/" + resId);
+    }
 
     @Override
     public void onAttachedToWindow() {
@@ -57,6 +64,21 @@ public class AerialDreamService extends DreamService {
         try { date.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
         clockBox.addView(time);
         clockBox.addView(date);
+        // Weather, read from the home's cached reading (no network in the dream) — like Apple's aerials.
+        try {
+            Weather.Reading wr = new Weather(this).cached();
+            if (wr != null) {
+                TextView weather = new TextView(this);
+                weather.setText(Math.round(wr.temp) + "°  " + getString(Weather.condition(wr.code)));
+                weather.setTextColor(0xCCFFFFFF);
+                weather.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                weather.setShadowLayer(12f, 0f, 1f, 0xB3000000);
+                weather.setIncludeFontPadding(false);
+                weather.setPadding(0, (int) (6 * d), 0, 0);
+                try { weather.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
+                clockBox.addView(weather);
+            }
+        } catch (Throwable ignored) {}
         FrameLayout.LayoutParams clp = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM | Gravity.START);
@@ -65,23 +87,37 @@ public class AerialDreamService extends DreamService {
 
         setContentView(root);
 
-        vv.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.aerial_loop));
+        // Shuffle the clips: start on a random one and advance to the next when each finishes, so the
+        // screensaver cycles like Apple's aerials instead of looping one shot.
+        clipIdx = new java.util.Random().nextInt(clips.length);
         vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override public void onPrepared(MediaPlayer mp) {
                 try {
-                    mp.setLooping(true);
                     mp.setVolume(0f, 0f);
                     mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
                 } catch (Throwable ignored) {}
                 vv.start();
             }
         });
-        vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override public boolean onError(MediaPlayer mp, int what, int extra) {
-                finish();
-                return true;
+        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override public void onCompletion(MediaPlayer mp) {
+                try {
+                    clipIdx = (clipIdx + 1) % clips.length;
+                    vv.setVideoURI(clipUri(clips[clipIdx]));
+                } catch (Throwable ignored) { finish(); }
             }
         });
+        vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override public boolean onError(MediaPlayer mp, int what, int extra) {
+                // Skip a bad clip to the next rather than ending the dream.
+                try {
+                    clipIdx = (clipIdx + 1) % clips.length;
+                    vv.setVideoURI(clipUri(clips[clipIdx]));
+                    return true;
+                } catch (Throwable ignored) { finish(); return true; }
+            }
+        });
+        vv.setVideoURI(clipUri(clips[clipIdx]));
     }
 
     @Override
