@@ -20,8 +20,9 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 - **Sleep timer** — Off / 15 / 30 / 60 / 90 min, fires the host StandBy screen.
 
 ### Added — system
-- **iPhone-style volume HUD** — a vertical capsule that fills white from the bottom with a speaker
-  button below, and **press-and-hold** ramping (accessibility overlay).
+- **iPhone-style volume HUD** — one tall capsule with the volume number at the top, a white fill that
+  climbs as you press or hold the button, and the speaker glyph inside; it covers Android TV's own
+  volume bar while that is up (accessibility overlay).
 - **Aerial video screensaver** — muted, looping, licence-clean drone clips that dissolve through
   black between shots, with a soft clock, date and live weather (condition icon + today's high/low).
 - **Photo screensaver, StandBy-style** — your own photos open the screensaver: the photo on the right
@@ -29,6 +30,9 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
   in a brass circle) on its dark left side. One aerial clip plays between photos.
 
 ### Fixed
+- The volume HUD now appears for the real remote. Android TV hands the volume keys to the system before
+  any accessibility service sees them, so the HUD follows volume changes instead of keys, and lies over
+  the system's volume bar until that bar has gone.
 - The tvx hooks re-attach when the launcher recreates its window (it does so at the dark-mode flip at
   sunset and sunrise); before, they were wired once per process and went quiet after the first flip.
 

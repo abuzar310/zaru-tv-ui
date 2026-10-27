@@ -1,5 +1,6 @@
 package com.gathin.tvhome;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -12,38 +13,62 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * An iPhone-style volume overlay: a tall rounded capsule on the left edge that fills white from the
- * bottom as the media volume rises, with a speaker glyph in a dark circle below it. Shown by
- * HomeKeyService while the volume keys are pressed, then it fades. Drawn by hand so there's no layout to
- * inflate from an accessibility overlay window.
+ * An iPhone-style volume overlay: one tall capsule that fills white from the bottom as the media volume
+ * rises, with the speaker glyph inside near the foot, dark on the fill and light on the track, like iOS.
+ * It sits on the right edge exactly over Android TV's own volume bar, which no app can switch off: an
+ * accessibility overlay is layered above the volume dialog, so this opaque capsule hides it while it is
+ * up. Shown by HomeKeyService on every volume change, then it fades. Drawn by hand, so there is no
+ * layout to inflate from an accessibility overlay window.
  */
 public class VolumeHud extends View {
 
-    private final Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint track = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint label = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF r = new RectF();
     private final Path clip = new Path();
     private final float d;
     private Drawable speaker, mute;
-    private float level = 0f;   // 0..1
+    private float shown;   // the drawn level, 0..1, easing toward the latest one
+    private int value;     // the volume step the TV reports, shown as a number at the top
     private boolean muted;
+    private ValueAnimator ease;
 
     public VolumeHud(Context c) {
         super(c);
         d = c.getResources().getDisplayMetrics().density;
-        bg.setColor(0xE6161618);
+        track.setColor(0xFF3A3A3C);   // opaque, so the system bar underneath never shows through
         fill.setColor(0xFFFFFFFF);
-        try { speaker = c.getDrawable(R.drawable.hud_speaker); } catch (Throwable ignored) {}
-        try { mute = c.getDrawable(R.drawable.hud_speaker_mute); } catch (Throwable ignored) {}
+        label.setTextAlign(Paint.Align.CENTER);
+        label.setTextSize(20 * c.getResources().getDisplayMetrics().scaledDensity);
+        try { label.setTypeface(c.getResources().getFont(R.font.outfit_medium)); } catch (Throwable ignored) {}
+        try { speaker = c.getDrawable(R.drawable.hud_speaker).mutate(); } catch (Throwable ignored) {}
+        try { mute = c.getDrawable(R.drawable.hud_speaker_mute).mutate(); } catch (Throwable ignored) {}
     }
 
-    public void set(float level, boolean muted) {
-        this.level = Math.max(0f, Math.min(1f, level));
+    /** The new level and step; eased when the HUD is already up (a held key ramps smoothly), set at once otherwise. */
+    public void set(float level, int value, boolean muted, boolean animate) {
+        final float target = Math.max(0f, Math.min(1f, level));
+        this.value = value;
         this.muted = muted;
-        invalidate();
+        if (ease != null) ease.cancel();
+        if (!animate) {
+            shown = target;
+            invalidate();
+            return;
+        }
+        ease = ValueAnimator.ofFloat(shown, target);
+        ease.setDuration(140);
+        ease.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override public void onAnimationUpdate(ValueAnimator a) {
+                shown = (float) a.getAnimatedValue();
+                invalidate();
+            }
+        });
+        ease.start();
     }
 
-    /** Overlay window params for an accessibility service: left edge, vertically centred, non-interactive. */
+    /** Overlay window params for an accessibility service: right edge, centred, over the system volume bar. */
     public WindowManager.LayoutParams params() {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -53,49 +78,47 @@ public class VolumeHud extends View {
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT);
-        lp.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
-        lp.x = (int) (56 * d);
+        lp.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+        lp.x = (int) (35 * d);
         return lp;
     }
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        setMeasuredDimension((int) (52 * d), (int) (256 * d));
+        // Tall enough that the rounded ends still cover the corners of the system bar (88x400 px at 1080p).
+        setMeasuredDimension((int) (56 * d), (int) (232 * d));
     }
 
     @Override
     protected void onDraw(Canvas cv) {
-        float capW = getWidth();
-        float btn = capW;            // speaker button is the same width as the bar (iPhone squircle)
-        float gap = 14 * d;
-        float capH = getHeight() - gap - btn;
-
-        // The track capsule.
-        r.set(0f, 0f, capW, capH);
-        cv.drawRoundRect(r, capW / 2f, capW / 2f, bg);
+        float w = getWidth(), h = getHeight(), rad = w / 2f;
+        r.set(0f, 0f, w, h);
+        cv.drawRoundRect(r, rad, rad, track);
 
         // White fill rising from the bottom to the current level, clipped to the capsule.
-        if (!muted && level > 0f) {
-            float fillTop = capH * (1f - level);
+        float fillTop = h * (1f - shown);
+        if (!muted && shown > 0f) {
             clip.reset();
-            clip.addRoundRect(r, capW / 2f, capW / 2f, Path.Direction.CW);
+            clip.addRoundRect(r, rad, rad, Path.Direction.CW);
             cv.save();
             cv.clipPath(clip);
-            cv.drawRect(0f, fillTop, capW, capH, fill);
+            cv.drawRect(0f, fillTop, w, h, fill);
             cv.restore();
         }
 
-        // Speaker glyph in a rounded-square button below the capsule, like iPhone's.
-        float cx = capW / 2f;
-        float top = capH + gap;
-        float rad = 16 * d;
-        r.set(0f, top, capW, top + btn);
-        cv.drawRoundRect(r, rad, rad, bg);
+        // The step number in the top of the capsule, where the system bar shows its own; dark once the fill reaches it.
+        Paint.FontMetrics fm = label.getFontMetrics();
+        float ny = rad - (fm.ascent + fm.descent) / 2f;
+        label.setColor(muted ? 0xFF8E8E93 : (fillTop <= rad + fm.ascent / 2f ? 0xFF3A3A3C : 0xFFFFFFFF));
+        cv.drawText(Integer.toString(value), w / 2f, ny, label);
+
+        // The glyph inside the foot of the capsule: dark grey on the white fill, light on the grey track.
         Drawable g = muted ? mute : speaker;
         if (g != null) {
-            float ic = 24 * d;
-            g.setBounds((int) (cx - ic / 2f), (int) (top + (btn - ic) / 2f),
-                    (int) (cx + ic / 2f), (int) (top + (btn + ic) / 2f));
+            float ic = 26 * d, cx = w / 2f, cy = h - rad;
+            boolean onFill = !muted && fillTop <= cy - ic / 2f;
+            g.setTint(onFill ? 0xFF636366 : 0xFFE5E5EA);
+            g.setBounds((int) (cx - ic / 2f), (int) (cy - ic / 2f), (int) (cx + ic / 2f), (int) (cy + ic / 2f));
             g.draw(cv);
         }
     }

@@ -1,12 +1,16 @@
 package com.gathin.tvhome;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,11 +24,21 @@ import java.util.Map;
  * (Xiaomi sticks and boxes). Android TV 9 routes that key only to the system-image launcher, so once
  * the stock launcher is disabled the button does nothing. Every other key passes through untouched.
  *
+ * It also draws the iPhone-style volume HUD. Android TV hands the remote's volume keys straight to the
+ * system (PhoneWindowManager routes them on TVs, and the accessibility key filter asks it first), so no
+ * service ever receives them; instead this follows every volume change and lays VolumeHud over the
+ * system's own volume bar until that bar has gone.
+ *
  * Enable over adb:
  *   settings put secure enabled_accessibility_services com.gathin.tvhome/.HomeKeyService
  *   settings put secure accessibility_enabled 1
  */
 public class HomeKeyService extends AccessibilityService {
+    private static final String TAG = "TvHome.Keys";
+    /** Sent by the Control Center volume slider (tvx), so dragging it does not pop the HUD over the panel. */
+    static final String ACTION_QUIET = "com.gathin.tvhome.VOLUME_HUD_QUIET";
+    /** Android TV's own volume bar stays about 3 s after the last change; the HUD outlasts it to keep it covered. */
+    private static final long HUD_MS = 3100;
 
     /** Remote buttons that should open Settings (config.xml, settings_key_scancodes and settings_key_keycodes). */
     private int[] settingsScancodes = new int[0];
@@ -33,11 +47,12 @@ public class HomeKeyService extends AccessibilityService {
     /** app_keys, the same map InputKeyService reads, for setups that run only this service. */
     private Map<Integer, String> appKeys = Collections.emptyMap();
 
-    /** tvOS-style volume overlay, shown while the volume keys are held. */
+    /** iPhone-style volume overlay, shown on every volume change. */
     private AudioManager audio;
     private WindowManager windows;
     private Handler ui;
     private VolumeHud hud;
+    private long quietUntil;
     private final Runnable hideHud = new Runnable() {
         @Override public void run() {
             if (hud == null) return;
@@ -46,19 +61,41 @@ public class HomeKeyService extends AccessibilityService {
             }).start();
         }
     };
+    private final BroadcastReceiver volumeWatch = new BroadcastReceiver() {
+        @Override public void onReceive(Context c, Intent i) {
+            if (ACTION_QUIET.equals(i.getAction())) {
+                quietUntil = SystemClock.uptimeMillis() + 800;
+                return;
+            }
+            int stream = i.getIntExtra("android.media.EXTRA_VOLUME_STREAM_TYPE", AudioManager.STREAM_MUSIC);
+            if (stream != AudioManager.STREAM_MUSIC || SystemClock.uptimeMillis() < quietUntil) return;
+            showVolume();
+            scheduleHideVolume();
+        }
+    };
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        // The HUD first, so it works even if a theme's config fails to load below.
+        audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        windows = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        ui = new Handler(Looper.getMainLooper());
+        try {
+            IntentFilter volume = new IntentFilter("android.media.VOLUME_CHANGED_ACTION");
+            volume.addAction("android.media.STREAM_MUTE_CHANGED_ACTION");
+            volume.addAction(ACTION_QUIET);
+            registerReceiver(volumeWatch, volume);
+        } catch (Throwable t) {
+            Log.w(TAG, "no volume listener", t);
+        }
         settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
         // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
         Config config = Config.load(this);
         settingsKeycodes = config.settingsKeycodes;
         settingsPanel = config.settingsKeyPanel;
         appKeys = RemoteKeys.parseAppKeys(config.appKeys);
-        audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        windows = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        ui = new Handler(Looper.getMainLooper());
+        Log.d(TAG, "connected, " + appKeys.size() + " app keys");
     }
 
     private boolean isSettingsKey(KeyEvent event) {
@@ -70,30 +107,9 @@ public class HomeKeyService extends AccessibilityService {
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        int kc = event.getKeyCode();
-        // Volume: handle every DOWN (including auto-repeat while held) ourselves, so press-and-hold ramps
-        // smoothly instead of one step per press, and show our own tvOS-style bar instead of the system UI.
-        if (kc == KeyEvent.KEYCODE_VOLUME_UP || kc == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                try {
-                    if (audio != null) audio.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                            kc == KeyEvent.KEYCODE_VOLUME_UP ? AudioManager.ADJUST_RAISE : AudioManager.ADJUST_LOWER, 0);
-                } catch (Throwable ignored) {}
-                showVolume();
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                scheduleHideVolume();
-            }
-            return true;
-        }
-        if (kc == KeyEvent.KEYCODE_VOLUME_MUTE) {
-            if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) {
-                try {
-                    if (audio != null) audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_TOGGLE_MUTE, 0);
-                } catch (Throwable ignored) {}
-                showVolume();
-                scheduleHideVolume();
-            }
-            return true;
+        // Finds a button's code for app_keys: adb logcat -s TvHome.Keys, then press it on the remote.
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            Log.d(TAG, "key " + event.getKeyCode() + " scan " + event.getScanCode());
         }
         // The stock launcher handled the remote's Settings button; with it disabled the button does nothing.
         if (isSettingsKey(event)) {
@@ -131,23 +147,25 @@ public class HomeKeyService extends AccessibilityService {
                 hud = new VolumeHud(this);
                 try { windows.addView(hud, hud.params()); } catch (Throwable t) { hud = null; return; }
             }
+            boolean up = hud.getVisibility() == View.VISIBLE && hud.getAlpha() > 0.5f;
             if (ui != null) ui.removeCallbacks(hideHud);
             hud.animate().cancel();
             hud.setVisibility(View.VISIBLE);
             hud.setAlpha(1f);
-            hud.set(level, muted);
+            hud.set(level, cur, muted, up);
         } catch (Throwable ignored) {}
     }
 
     private void scheduleHideVolume() {
         if (ui != null) {
             ui.removeCallbacks(hideHud);
-            ui.postDelayed(hideHud, 1300);
+            ui.postDelayed(hideHud, HUD_MS);
         }
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
+        try { unregisterReceiver(volumeWatch); } catch (Throwable ignored) {}
         try { if (ui != null) ui.removeCallbacks(hideHud); } catch (Throwable ignored) {}
         try { if (windows != null && hud != null) windows.removeView(hud); } catch (Throwable ignored) {}
         hud = null;
