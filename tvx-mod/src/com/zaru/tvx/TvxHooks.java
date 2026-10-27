@@ -27,6 +27,9 @@ public final class TvxHooks {
             decor.setTag(TAG_INSTALLED, Boolean.TRUE);
 
             seedSettings(a);
+            // Have the system create Android/data/<pkg>/files with our ownership, so a StandBy photo can be
+            // pushed into it over adb (StandByHouse reads standby.jpg from there).
+            try { a.getExternalFilesDir(null); } catch (Throwable ignored) {}
 
             // Apple-TV focus feel + Control Center wiring, both driven off the one global focus listener.
             decor.getViewTreeObserver().addOnGlobalFocusChangeListener(

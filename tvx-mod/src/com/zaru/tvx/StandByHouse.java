@@ -28,8 +28,8 @@ import android.widget.TextView;
 import java.io.File;
 
 /**
- * His StandBy in the house design (StandByActivity, and ClockDream when StandBy is the screensaver): the
- * Background picture (files/cw_background.jpg, set in Appearance > Background > Picture or Send from Phone)
+ * His StandBy in the house design (StandByActivity, and ClockDream when StandBy is the screensaver): a photo
+ * (standby.jpg pushed to Android/data/com.sid.tvos/files, else the Background picture his settings save)
  * drifting slowly, and on its dark left side a big brushed-brass clock, the date, the weather from his own
  * cache and a month calendar, in the champagne gold of the house's lights. It matches the house scene of
  * the screensaver. With no picture saved his StandBy stays as it is.
@@ -56,9 +56,20 @@ final class StandByHouse {
         }
     }
 
+    /** The photo: a standby.jpg pushed into his external files folder (Android/data/com.sid.tvos/files) wins,
+     *  then the Background picture his own settings save. */
+    private static File picture(Context c) {
+        try {
+            File ext = c.getExternalFilesDir(null);
+            if (ext != null && new File(ext, "standby.jpg").isFile()) return new File(ext, "standby.jpg");
+        } catch (Throwable ignored) {}
+        File saved = new File(c.getFilesDir(), "cw_background.jpg");
+        return saved.isFile() ? saved : null;
+    }
+
     private static View build(Context c) {
-        File pic = new File(c.getFilesDir(), "cw_background.jpg");
-        if (!pic.isFile()) return null;
+        File pic = picture(c);
+        if (pic == null) return null;
         DisplayMetrics dm = c.getResources().getDisplayMetrics();
         Bitmap bm = decode(pic, dm.widthPixels, dm.heightPixels);
         if (bm == null) return null;

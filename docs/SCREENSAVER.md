@@ -46,3 +46,11 @@ adb shell chmod 2775 /sdcard/Android/data/com.gathin.tvhome/files/screensaver
 Photos play in name order (`01-…`, `02-…`). Use landscape 16:9 pictures, 1920×1080 or larger, with the
 subject on the right and calmer, darker space on the left where the clock and calendar sit. Personal photos
 stay out of this repository.
+
+The launcher's **StandBy** uses the same design. Its photo is `standby.jpg` in the tvOS Launcher's own
+folder (the launcher creates it on start), else the Background picture saved in its settings:
+
+```
+adb push our-home.jpg /sdcard/Android/data/com.sid.tvos/files/standby.jpg
+adb shell chmod 644 /sdcard/Android/data/com.sid.tvos/files/standby.jpg
+```
