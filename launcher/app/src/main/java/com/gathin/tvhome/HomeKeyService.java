@@ -31,6 +31,8 @@ import java.util.Map;
  * service ever receives them; instead this follows every volume change and lays VolumeHud over the
  * system's own volume bar until that bar has gone.
  *
+ * And it runs the Control Center's sleep timer (SleepTimer), which has to outlast the panel and see the buttons.
+ *
  * Enable over adb:
  *   settings put secure enabled_accessibility_services com.gathin.tvhome/.HomeKeyService
  *   settings put secure accessibility_enabled 1
@@ -41,6 +43,27 @@ public class HomeKeyService extends AccessibilityService {
     static final String ACTION_QUIET = "com.gathin.tvhome.VOLUME_HUD_QUIET";
     /** Android TV's own volume bar stays about 3 s after the last change; the HUD outlasts it to keep it covered. */
     private static final long HUD_MS = 3100;
+
+    /** The running service, for the Control Center: its sleep timer, and Turn off when SleepService is not on. */
+    private static HomeKeyService running;
+    private SleepTimer sleepTimer;
+    private final BroadcastReceiver screenOff = new BroadcastReceiver() {
+        @Override public void onReceive(Context c, Intent i) {
+            if (sleepTimer != null) sleepTimer.cancel();
+        }
+    };
+
+    /** The sleep timer, or null while this service is not running. */
+    static SleepTimer sleepTimer() {
+        HomeKeyService s = running;
+        return s == null ? null : s.sleepTimer;
+    }
+
+    /** Puts the TV to sleep with the lock-screen action, as SleepService does; false while this is not running. */
+    static boolean sleep() {
+        HomeKeyService s = running;
+        return s != null && s.performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN);
+    }
 
     /** Remote buttons that should open Settings (config.xml, settings_key_scancodes and settings_key_keycodes). */
     private int[] settingsScancodes = new int[0];
@@ -91,6 +114,13 @@ public class HomeKeyService extends AccessibilityService {
         } catch (Throwable t) {
             Log.w(TAG, "no volume listener", t);
         }
+        sleepTimer = new SleepTimer(this, ui);
+        try {
+            registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        } catch (Throwable t) {
+            Log.w(TAG, "no screen-off listener", t);
+        }
+        running = this;
         settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
         // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
         Config config = Config.load(this);
@@ -164,6 +194,7 @@ public class HomeKeyService extends AccessibilityService {
     private void onVolumeKey(int key, boolean down, boolean repeat) {
         if (ui == null) return;
         ui.removeCallbacks(holdStep);
+        if (down && !repeat && sleepTimer != null) sleepTimer.onActivity();
         if (!down || repeat || heldKey == key) {
             heldKey = 0;
             return;
@@ -186,6 +217,8 @@ public class HomeKeyService extends AccessibilityService {
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             Log.d(TAG, "key " + event.getKeyCode() + " scan " + event.getScanCode());
         }
+        // The sleep timer's last minute: any button keeps the TV on, and does only that.
+        if (sleepTimer != null && sleepTimer.onKey(event)) return true;
         // The stock launcher handled the remote's Settings button; with it disabled the button does nothing.
         if (isSettingsKey(event)) {
             if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) {
@@ -240,6 +273,9 @@ public class HomeKeyService extends AccessibilityService {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        if (running == this) running = null;
+        try { if (sleepTimer != null) sleepTimer.release(); } catch (Throwable ignored) {}
+        try { unregisterReceiver(screenOff); } catch (Throwable ignored) {}
         following = false;
         heldKey = 0;
         try { if (keyLog != null) keyLog.destroy(); } catch (Throwable ignored) {}

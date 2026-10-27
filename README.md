@@ -34,9 +34,13 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 - **Auto day/night** — a vivid light theme by day, an OLED-friendly dark theme at night (on schedule).
 
 **Control Center**
-- A **volume slider** bound to the media stream (D-pad adjustable, re-syncs on open).
-- A **Now Playing** strip that appears while media is playing.
-- A **sleep timer** (Off / 15 / 30 / 60 / 90 min) that drops the TV into StandBy when it fires.
+- The remote's **gear** opens it over whatever app is on screen, with nothing dimmed behind it.
+- **Now Playing** — the artwork, title and a progress line for whatever any app is playing; OK plays or
+  pauses, Left and Right skip 10 s.
+- **Sleep timer** (Off / 15 / 30 / 60 / 90 min) — a minute before the end a notice counts down and any
+  button keeps the TV on; otherwise it pauses what is playing and turns the TV off.
+- On Home, the tvOS Launcher's own Control Center adds a **volume slider** (D-pad adjustable), a Now
+  Playing strip and a sleep timer that drops the TV into StandBy.
 
 **System**
 - **iPhone-style volume HUD** — one tall capsule with the volume number at the top, a white fill that

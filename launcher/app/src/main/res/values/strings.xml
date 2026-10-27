@@ -84,6 +84,17 @@
     <string name="quick_sound">Sound</string>
     <string name="quick_volume">Volume %d</string>
     <string name="quick_power">Turn off</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="sleep_timer_minutes">%d min</string>
+    <string name="sleep_notice">Turning off in %d s</string>
+    <string name="sleep_notice_hint">Press any button to keep watching</string>
+    <string name="sleep_notice_cancelled">Sleep timer off</string>
+    <string name="sleep_notice_cancelled_hint">The TV stays on</string>
+    <string name="now_playing">Playing</string>
+    <string name="now_paused">Paused</string>
+    <string name="now_playing_back">Back 10 s</string>
+    <string name="now_playing_ahead">Ahead 10 s</string>
+    <string name="media_listener_name">Now Playing</string>
     <string name="weather_clear">Clear</string>
     <string name="weather_mainly_clear">Mostly clear</string>
     <string name="weather_partly_cloudy">Partly cloudy</string>

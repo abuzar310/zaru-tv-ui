@@ -26,10 +26,27 @@ jank on a 1 GB GPU. The Control Center and our own controls are excluded so they
 - **Sleep timer** — cycles Off / 15 / 30 / 60 / 90 on OK, schedules an exact alarm, and fires the host's
   own StandBy screen when it elapses (so nothing else needs touching).
 
+## The gear's Control Center (`launcher/.../QuickSettingsActivity.java`, `NowPlayingCard.java`, `SleepTimer.java`)
+The remote's gear opens the launcher's own panel over the current app (`HomeKeyService` catches the key).
+- **Now Playing** — `MediaSessionManager.getActiveSessions` lists other apps' sessions only to an allowed
+  notification listener (`MediaListener`, which reads nothing). The card follows the first session that is
+  playing (else one paused that has a title): artwork or the app's icon, title, artist or app name, and a
+  progress line from the session's position and duration. OK plays or pauses through its transport
+  controls; Left and Right seek 10 s where the session allows `ACTION_SEEK_TO`.
+- **Sleep timer** — a tile that steps Off / 15 / 30 / 60 / 90 on OK while the panel stays open. The timer
+  runs in `HomeKeyService`, which is always bound and so outlives the panel. A minute before the end it lays
+  a countdown card over any app (`TYPE_ACCESSIBILITY_OVERLAY`); any button or volume press in that minute
+  cancels it ("Sleep timer off"). Otherwise it sends a media pause and puts the TV to sleep with the
+  accessibility lock-screen action, the same as **Turn off**. Screen-off clears it, so a timer never carries
+  over to the next time the TV is on.
+- The panel scrolls when Now Playing and every row will not fit; the two tiles in a row share one height.
+
 ## Volume HUD + press-and-hold (`launcher/.../VolumeHud.java`, `HomeKeyService.java`)
-The launcher's accessibility service now handles the volume keys itself: every key-down (including
-auto-repeat while held) nudges the media volume, so **holding ramps** instead of one step per press. A
-hand-drawn tvOS-style bar is shown in a `TYPE_ACCESSIBILITY_OVERLAY` window and fades after ~1.3 s.
+Android TV hands the volume keys to the system before any accessibility service sees them, so the HUD
+follows `VOLUME_CHANGED_ACTION` and lies over the system's own bar (an accessibility overlay sits above it)
+until that bar has gone. A Bluetooth remote sends no repeats while an accessibility key filter runs, so a
+held button is followed through the system key log (READ_LOGS) and repeated one step every ~90 ms after a
+0.4 s hold.
 
 ## Aerial screensaver (`launcher/.../AerialDreamService.java`)
 A `DreamService` that plays a muted, looping, crop-to-fill cinematic clip

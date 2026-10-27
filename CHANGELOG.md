@@ -19,6 +19,12 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 - **Now Playing** strip while media is playing.
 - **Sleep timer** — Off / 15 / 30 / 60 / 90 min, fires the host StandBy screen.
 
+### Added — the gear's Control Center
+- **Now Playing** card — the artwork, title and a progress line for whatever any app is playing; OK plays
+  or pauses, Left and Right skip 10 s. Hidden while nothing plays.
+- **Sleep timer** — Off / 15 / 30 / 60 / 90 min. A minute before the end a notice counts down over any app,
+  and any button keeps the TV on; otherwise it pauses what is playing and turns the TV off.
+
 ### Added — system
 - **iPhone-style volume HUD** — one tall capsule with the volume number at the top, a white fill that
   climbs as you press or hold the button, and the speaker glyph inside; it covers Android TV's own
@@ -44,6 +50,10 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
   the system's volume bar until that bar has gone.
 - The tvx hooks re-attach when the launcher recreates its window (it does so at the dark-mode flip at
   sunset and sunrise); before, they were wired once per process and went quiet after the first flip.
+
+- **Turn off** in the gear's panel works: it relied only on the separate Sleep accessibility service, which
+  is not on here, and now falls back to the launcher's always-on one.
+- The gear panel's paired tiles share one height, and the panel scrolls when its rows will not fit.
 
 ### Notes
 - All of `tvx-mod` is defensive (`try/catch`) — an effect can only fail to appear, never crash the host.

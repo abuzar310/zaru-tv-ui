@@ -31,5 +31,6 @@ crashes. That's what makes it safe to apply to a Home launcher you depend on.
 | `CcExtras` | Finds the Control Center by id and wires the volume slider + Now Playing. |
 | `SleepTimer` | Control Center sleep timer — an exact alarm that fires the host's StandBy screen. |
 
-The launcher-side additions (`VolumeHud`, `AerialDreamService`, the `HomeKeyService` volume handling)
-live under `launcher/` because they belong to our own app, not the injected layer.
+The launcher-side additions (`VolumeHud`, `AerialDreamService`, the `HomeKeyService` volume handling, and
+the gear's Control Center with `NowPlayingCard` and the launcher's own `SleepTimer`) live under `launcher/`
+because they belong to our own app, not the injected layer.

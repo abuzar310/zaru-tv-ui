@@ -214,6 +214,18 @@
                 android:resource="@xml/input_key_service" />
         </service>
 
+        <!-- Control Center's Now Playing: Android lists other apps' media sessions only to an allowed notification
+             listener. `cmd notification allow_listener com.gathin.tvhome/com.gathin.tvhome.MediaListener`. -->
+        <service
+            android:name=".MediaListener"
+            android:exported="true"
+            android:label="@string/media_listener_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <!-- Settings menu, Sleep: the lock-screen action puts the TV to sleep; see SleepService. -->
         <service
             android:name=".SleepService"

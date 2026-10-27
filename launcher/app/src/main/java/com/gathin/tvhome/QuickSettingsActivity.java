@@ -25,10 +25,11 @@ import java.util.Date;
 
 /**
  * Control Center: the panel the remote's Settings button opens when {@code settings_key_panel} is on
- * (HomeKeyService). A dark glass panel slides in from the right edge with the time, the network, Inputs,
- * Sound, Display and wide rows for the TV's settings, over Home or whatever app is playing. Translucent and in
- * a task of its own, so the app behind keeps running and Back returns to it. Pressing Settings again closes
- * the panel. Nothing in it runs while it is closed. Ported from Matchday TV (nahtheking/matchday-tv, MIT).
+ * (HomeKeyService). A dark glass panel slides in from the right edge with the time, what is playing (Now Playing),
+ * the network, Inputs, Sound, Display, the sleep timer, Turn off and wide rows for the TV's settings, over Home or
+ * whatever app is playing. Translucent and in a task of its own, so the app behind keeps running and Back returns to
+ * it. Pressing Settings again closes the panel. Nothing in it runs while it is closed. Ported from Matchday TV
+ * (nahtheking/matchday-tv, MIT).
  */
 public final class QuickSettingsActivity extends Activity {
 
@@ -39,6 +40,7 @@ public final class QuickSettingsActivity extends Activity {
 
     private LinearLayout tiles;
     private LinearLayout pair;
+    private NowPlayingCard nowPlaying;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -56,18 +58,20 @@ public final class QuickSettingsActivity extends Activity {
         ((TextView) findViewById(R.id.ccDate)).setText(DateFormat.format(getString(R.string.date_format), new Date()));
 
         tiles = findViewById(R.id.tiles);
+        nowPlaying = new NowPlayingCard(this);
         addTile(R.drawable.ic_wifi, getString(R.string.quick_network), networkStatus(), new Intent(Settings.ACTION_WIFI_SETTINGS), false);
         addTile(R.drawable.ic_input, getString(R.string.inputs), null, new Intent(ACTION_VIEW_INPUTS), false);
         addTile(R.drawable.ic_sound, getString(R.string.quick_sound), volumeStatus(), firstAnswered(new Intent(ACTION_VIEW_SOUND),
                 new Intent(Settings.ACTION_SOUND_SETTINGS)), false);
         addTile(R.drawable.ic_picture, getString(R.string.quick_picture), null, new Intent(Settings.ACTION_DISPLAY_SETTINGS), false);
+        addSleepTile();
+        addPowerTile();
         addTile(R.drawable.ic_settings, getString(R.string.tv_settings), null, new Intent(Settings.ACTION_SETTINGS), true);
         addTile(R.drawable.ic_apps, getString(R.string.quick_apps), getString(R.string.quick_apps_hint),
                 new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS), true);
         // Through Home, so it rebuilds with the new choices when Launcher settings closes.
         addTile(R.drawable.ic_home_settings, getString(R.string.launcher_settings), null,
                 new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCHER_SETTINGS), true);
-        addPowerTile();
         tiles.getChildAt(0).requestFocus();
 
         // Slide in from the right edge; the scrim fades in with it. One translation of a cached layer.
@@ -82,6 +86,12 @@ public final class QuickSettingsActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (nowPlaying != null) nowPlaying.release();
+        super.onDestroy();
     }
 
     /** Anything else taking the screen (Home, an app, a screensaver) closes the panel. */
@@ -134,13 +144,38 @@ public final class QuickSettingsActivity extends Activity {
         return tile;
     }
 
-    /** Turn off: the Sleep row's accessibility service puts the TV to sleep, as the remote's power button does. */
+    /** Turn off: an accessibility service puts the TV to sleep, as the remote's power button does: the Sleep row's
+     *  own, or HomeKeyService, which is on wherever this panel opens from the remote. */
     private void addPowerTile() {
-        View tile = newTile(R.drawable.ic_power, getString(R.string.quick_power), null, true);
+        View tile = newTile(R.drawable.ic_power, getString(R.string.quick_power), null, false);
         tile.setOnClickListener(v -> {
             finish();
-            if (!SleepService.sleep()) Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
+            if (!SleepService.sleep() && !HomeKeyService.sleep()) {
+                Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    /** Sleep timer: each OK steps Off, 15, 30, 60, 90 minutes. The panel stays open to show the choice. */
+    private void addSleepTile() {
+        View tile = newTile(R.drawable.ic_timer, getString(R.string.sleep_timer), sleepStatus(), false);
+        TextView sub = tile.findViewById(R.id.ccSub);
+        tile.setOnClickListener(v -> {
+            SleepTimer timer = HomeKeyService.sleepTimer();
+            if (timer == null) {
+                Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            timer.next();
+            sub.setText(sleepStatus());
+        });
+    }
+
+    /** "Off", or the minutes left. */
+    private String sleepStatus() {
+        SleepTimer timer = HomeKeyService.sleepTimer();
+        int left = timer == null ? 0 : timer.minutesLeft();
+        return left == 0 ? getString(R.string.off) : getString(R.string.sleep_timer_minutes, left);
     }
 
     /** Square tiles go two to a row; a wide one takes a row of its own. */
@@ -172,6 +207,10 @@ public final class QuickSettingsActivity extends Activity {
             LinearLayout.LayoutParams textLp = (LinearLayout.LayoutParams) tile.findViewById(R.id.ccText).getLayoutParams();
             textLp.topMargin = 0;
             textLp.setMarginStart(Math.round(14 * density));
+        } else {
+            // The two squares in a row share one height, icons level at the top.
+            tile.setGravity(Gravity.TOP);
+            tile.getLayoutParams().height = LinearLayout.LayoutParams.MATCH_PARENT;
         }
         if (row.getChildCount() == 1) ((LinearLayout.LayoutParams) tile.getLayoutParams()).setMarginStart(gap);
         row.addView(tile);

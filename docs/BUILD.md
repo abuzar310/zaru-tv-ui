@@ -17,6 +17,10 @@ services if you want the Home-key handling and the volume HUD:
 ```
 adb shell settings put secure enabled_accessibility_services com.gathin.tvhome/.HomeKeyService
 adb shell settings put secure accessibility_enabled 1
+# Holding a volume button keeps moving the volume (HomeKeyService follows the system key log):
+adb shell pm grant com.gathin.tvhome android.permission.READ_LOGS
+# The gear panel's Now Playing card (Android lists other apps' media only to an allowed listener):
+adb shell cmd notification allow_listener com.gathin.tvhome/com.gathin.tvhome.MediaListener
 ```
 
 Aerial screensaver: `adb shell settings put secure screensaver_components com.gathin.tvhome/.AerialDreamService`.
