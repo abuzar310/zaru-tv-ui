@@ -7,6 +7,14 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 > Personal use only. This repository is a private backup of **my own** work. It does **not** contain
 > any third-party app's decompiled code or APKs (see *Credits & licensing* below).
 
+## Screenshots
+
+| | |
+|:---:|:---:|
+| ![Cinematic hero](docs/media/01-hero-scrim.png)<br>**Cinematic hero + scrim** | ![Focus engine](docs/media/02-focus-lift.png)<br>**Focus engine** |
+| ![Ambient glow](docs/media/03-ambient-glow.png)<br>**Ambient glow** | ![Control Center](docs/media/04-control-center.png)<br>**Control Center** |
+| ![Sleep timer](docs/media/05-sleep-timer.png)<br>**Sleep timer** | ![Aerial screensaver](docs/media/06-aerial-screensaver.png)<br>**Aerial screensaver** |
+
 ## What it does
 
 **Launcher chrome & motion**
