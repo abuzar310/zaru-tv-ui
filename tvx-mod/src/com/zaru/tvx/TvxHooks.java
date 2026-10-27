@@ -13,15 +13,18 @@ import android.view.ViewTreeObserver;
  * install() is called once from MainActivity.onCreate, after setContentView.
  */
 public final class TvxHooks {
-    private static boolean installed;
+    /** Marks a window as wired. Per window, not per process: he recreate()s MainActivity when the icon style
+     *  changes (the dark-mode flip at sunset and sunrise), and the new window needs the hooks again. */
+    private static final int TAG_INSTALLED = 0x7e0d0002;
 
     private TvxHooks() {}
 
     public static void install(final Activity a) {
         try {
-            if (installed || a == null) return;
-            installed = true;
+            if (a == null) return;
             final View decor = a.getWindow().getDecorView();
+            if (decor.getTag(TAG_INSTALLED) != null) return;
+            decor.setTag(TAG_INSTALLED, Boolean.TRUE);
 
             seedSettings(a);
 
@@ -34,6 +37,7 @@ public final class TvxHooks {
                         try { CcExtras.ensure(a, decor); } catch (Throwable ignored) {}
                         try { SleepTimer.ensure(a, decor); } catch (Throwable ignored) {}
                         try { HeroFx.ensure(a, decor); } catch (Throwable ignored) {}
+                        try { HomeWallpaper.ensure(a, decor); } catch (Throwable ignored) {}
                     }
                 });
 
@@ -44,6 +48,7 @@ public final class TvxHooks {
                     try { GlowFx.ensure(a, decor); } catch (Throwable ignored) {}
                     try { CcExtras.ensure(a, decor); } catch (Throwable ignored) {}
                     try { SleepTimer.ensure(a, decor); } catch (Throwable ignored) {}
+                    try { HomeWallpaper.ensure(a, decor); } catch (Throwable ignored) {}
                 }
             }, 1200);
         } catch (Throwable ignored) {}

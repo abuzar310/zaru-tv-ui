@@ -11,8 +11,9 @@ the host launcher can never crash because of it.
 
 | File | Effect |
 |---|---|
-| `TvxHooks.java` | The single entry point, called once from `MainActivity.onCreate`. Wires up everything and seeds the night dark-mode schedule. |
+| `TvxHooks.java` | The single entry point, called from `MainActivity.onCreate` once per window (the host recreates the activity at the dark-mode flip). Wires up everything and seeds the night dark-mode schedule. |
 | `HeroFx.java` | **Living hero** — an infinite Ken-Burns drift on the two shelf backdrop ImageViews. |
+| `HomeWallpaper.java` | **Home wallpaper** — draws the picture the host's *Background: Picture* setting saves (2.0.1 stores it but never shows it): with the shelf Off it sits just above `shelfGroup`, under the scrim and dock, with a slow drift. |
 | `GlowFx.java` + `GlowView.java` | **Ambient glow** — samples the hero's dominant colour (and a focused app's brand colour) and washes the screen rim with it. |
 | `FocusFx.java` | **Focus engine** — the focused tile springs up (scale + shadow) with an overshoot. |
 | `CcExtras.java` | Control Center **volume slider** (STREAM_MUSIC) and **Now Playing** strip. |

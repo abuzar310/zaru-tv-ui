@@ -25,6 +25,8 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 
 **Launcher chrome & motion**
 - **Living hero** — the featured backdrop slowly zooms and pans (Ken Burns), so the home breathes.
+- **Home wallpaper** — any photo as the home background, drifting gently behind the dock (set it in
+  the launcher's Appearance → Background → Picture, or send it from a phone).
 - **Ambient glow** — the screen rim glows with the hero's dominant colour, and shifts to a focused
   app's brand colour as you move through the grid.
 - **Focus engine** — the focused tile springs up with a shadow (compositor-only, smooth on 1 GB).

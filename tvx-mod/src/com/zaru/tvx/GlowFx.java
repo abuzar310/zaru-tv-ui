@@ -100,7 +100,10 @@ final class GlowFx {
         try {
             // Leave a focused app's brand glow alone until it expires, then drift back to the hero colour.
             if (System.currentTimeMillis() >= brandUntil) {
-                int c = dominant(image(a, decor, "shelf"));
+                // The home wallpaper, when showing, covers the shelf: glow with its colour, not the hidden art.
+                View wall = decor.findViewWithTag("tvxWall");
+                int c = wall instanceof ImageView ? dominant((ImageView) wall) : 0;
+                if (c == 0) c = dominant(image(a, decor, "shelf"));
                 if (c == 0) c = dominant(image(a, decor, "shelf2"));
                 if (glow != null && c != 0) glow.setGlow(c);
             }
