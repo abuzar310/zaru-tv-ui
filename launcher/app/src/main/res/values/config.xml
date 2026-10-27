@@ -98,6 +98,8 @@
         <item>4065:com.google.android.youtube.tv</item>
         <item>4062:com.netflix.ninja</item>
         <item>4099:com.amazon.amazonvideo.livingroom</item>
+        <!-- The fourth app button (Sony LIV on the Indian remote, "Web" elsewhere) opens NetMirror instead. -->
+        <item>4159:app.netmirror.newtv</item>
     </string-array>
 
     <!-- Apple aerial looping behind Home, from the launcher's files/aerials folder on the TV
