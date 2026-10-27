@@ -23,6 +23,7 @@ import android.widget.VideoView;
 public class AerialDreamService extends DreamService {
 
     private VideoView video;
+    private View fade;   // black layer above the video, below the clock, for dip-to-black clip changes
     private final int[] clips = { R.raw.aerial_loop, R.raw.aerial_loop2, R.raw.aerial_loop3 };
     private int clipIdx;
 
@@ -56,6 +57,14 @@ public class AerialDreamService extends DreamService {
         root.setBackgroundColor(Color.BLACK);
         root.addView(vv, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+        // A black layer over the video (under the clock) that dips in and out when the clip changes, so
+        // clips dissolve through black like Apple's aerials instead of cutting hard.
+        fade = new View(this);
+        fade.setBackgroundColor(Color.BLACK);
+        fade.setAlpha(0f);
+        root.addView(fade, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         // A soft clock over the aerial, like Apple's — the StandBy clock you like, on top of the video.
         float d = getResources().getDisplayMetrics().density;
@@ -121,14 +130,23 @@ public class AerialDreamService extends DreamService {
                     mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
                 } catch (Throwable ignored) {}
                 vv.start();
+                // Lift the black now the next clip is drawing.
+                if (fade != null && fade.getAlpha() > 0f) fade.animate().alpha(0f).setDuration(600).start();
             }
         });
         vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override public void onCompletion(MediaPlayer mp) {
-                try {
-                    clipIdx = (clipIdx + 1) % clips.length;
-                    vv.setVideoURI(clipUri(clips[clipIdx]));
-                } catch (Throwable ignored) { finish(); }
+                final Runnable next = new Runnable() {
+                    @Override public void run() {
+                        try {
+                            clipIdx = (clipIdx + 1) % clips.length;
+                            vv.setVideoURI(clipUri(clips[clipIdx]));
+                        } catch (Throwable ignored) { finish(); }
+                    }
+                };
+                // Dip to black, then swap the clip; onPrepared lifts the black as the next one starts.
+                if (fade != null) fade.animate().alpha(1f).setDuration(280).withEndAction(next).start();
+                else next.run();
             }
         });
         vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
