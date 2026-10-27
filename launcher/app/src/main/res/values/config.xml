@@ -74,6 +74,8 @@
     <!-- Empty while tvOS Launcher (com.sid.tvos) is Home: its Button Remap maps the gear (83) to its own Control
          Center ("launcher:cc"), and it only sees the key if this helper lets it through. Put 83 back for ours. -->
     <integer-array name="settings_key_keycodes">
+        <!-- TCL BT_RC833: the gear sends 83 (scan 233); it opens the Control Center panel over the current app. -->
+        <item>83</item>
     </integer-array>
     <!-- What those Settings buttons open: false, the TV's Settings; true, a small glass panel at the top right
          with TV settings, Display, Network, Apps (re-enable an app) and Launcher settings, over whatever is on screen.

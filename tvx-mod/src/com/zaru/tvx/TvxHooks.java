@@ -75,6 +75,15 @@ public final class TvxHooks {
                 // dark_schedule: 1 = Sunset (dark automatically through the night).
                 ap.edit().putInt("dark_schedule", 1).putBoolean("tvx_seed_v1", true).apply();
             }
+            if (!ap.getBoolean("tvx_seed_v2", false)) {
+                // The remote's gear (83) was remapped to his Control Center, which lives on Home: from any app it
+                // threw you out to Home. The launcher's HomeKeyService now opens its own panel over the app
+                // instead, so drop that one remap, once (a remap made later in Button Remap is left alone).
+                SharedPreferences remaps = a.getSharedPreferences("remaps", 0);
+                String gear = remaps.getString("k83", null);
+                if (gear != null && gear.startsWith("launcher:")) remaps.edit().remove("k83").apply();
+                ap.edit().putBoolean("tvx_seed_v2", true).apply();
+            }
         } catch (Throwable ignored) {}
     }
 }
