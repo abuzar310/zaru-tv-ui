@@ -41,7 +41,7 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 **System**
 - **iPhone-style volume HUD** — one tall capsule with the volume number at the top, a white fill that
   climbs as you press or hold the button, and the speaker glyph inside, laid over Android TV's own
-  volume bar so that one never shows.
+  volume bar so that one never shows. Each press moves the volume 5 (not 1), each held repeat 2.
 - **Photo + aerial screensaver** — your own photos StandBy-style (the photo on the right; a big brass
   clock, the date, the weather and a month calendar on the left), with a muted drone clip between them
   and every change dissolving through black. See [docs/SCREENSAVER.md](docs/SCREENSAVER.md).

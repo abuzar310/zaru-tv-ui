@@ -23,6 +23,8 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 - **iPhone-style volume HUD** — one tall capsule with the volume number at the top, a white fill that
   climbs as you press or hold the button, and the speaker glyph inside; it covers Android TV's own
   volume bar while that is up (accessibility overlay).
+- **Bigger volume steps** — the TV's 0–100 volume moves 5 per press instead of 1, and 2 per repeat while
+  the button is held, so a press is audible and a hold still ramps smoothly.
 - **Aerial video screensaver** — muted, looping, licence-clean drone clips that dissolve through
   black between shots, with a soft clock, date and live weather (condition icon + today's high/low).
 - **StandBy in the house design** — the launcher's StandBy (the sleep timer's screen and *Preview
