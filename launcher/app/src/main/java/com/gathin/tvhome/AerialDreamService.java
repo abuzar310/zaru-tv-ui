@@ -33,7 +33,12 @@ public class AerialDreamService extends DreamService {
     private void showWeather(TextView tv, Weather.Reading r) {
         if (tv == null || r == null) return;
         try {
-            tv.setText(Math.round(r.temp) + "°  " + getString(Weather.condition(r.code)));
+            float d = getResources().getDisplayMetrics().density;
+            tv.setText(Math.round(r.temp) + "°  " + getString(Weather.condition(r.code))
+                    + "    H " + Math.round(r.high) + "°   L " + Math.round(r.low) + "°");
+            tv.setCompoundDrawablesWithIntrinsicBounds(Weather.lineIcon(r.code, r.day), 0, 0, 0);
+            tv.setCompoundDrawablePadding((int) (10 * d));
+            tv.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(0xE6FFFFFF));
             tv.setVisibility(View.VISIBLE);
         } catch (Throwable ignored) {}
     }

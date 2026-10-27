@@ -21,7 +21,7 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 - **iPhone-style volume HUD** — a vertical capsule that fills white from the bottom with a speaker
   button below, and **press-and-hold** ramping (accessibility overlay).
 - **Aerial video screensaver** — muted, looping, licence-clean drone clips with a soft clock, date
-  and live weather.
+  and live weather (condition icon + today's high/low).
 
 ### Notes
 - All of `tvx-mod` is defensive (`try/catch`) — an effect can only fail to appear, never crash the host.
