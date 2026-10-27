@@ -3,6 +3,7 @@ package com.gathin.tvhome;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -11,16 +12,17 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * A tvOS-style volume overlay: a rounded translucent pill, a speaker glyph, and a white fill bar that
- * tracks the media volume. Shown by HomeKeyService while the volume keys are pressed, then it fades.
- * Drawn by hand so there is no layout to inflate from an accessibility overlay window.
+ * An iPhone-style volume overlay: a tall rounded capsule on the left edge that fills white from the
+ * bottom as the media volume rises, with a speaker glyph in a dark circle below it. Shown by
+ * HomeKeyService while the volume keys are pressed, then it fades. Drawn by hand so there's no layout to
+ * inflate from an accessibility overlay window.
  */
 public class VolumeHud extends View {
 
     private final Paint bg = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint track = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF r = new RectF();
+    private final Path clip = new Path();
     private final float d;
     private Drawable speaker, mute;
     private float level = 0f;   // 0..1
@@ -30,7 +32,6 @@ public class VolumeHud extends View {
         super(c);
         d = c.getResources().getDisplayMetrics().density;
         bg.setColor(0xE6161618);
-        track.setColor(0x3DFFFFFF);
         fill.setColor(0xFFFFFFFF);
         try { speaker = c.getDrawable(R.drawable.hud_speaker); } catch (Throwable ignored) {}
         try { mute = c.getDrawable(R.drawable.hud_speaker_mute); } catch (Throwable ignored) {}
@@ -42,7 +43,7 @@ public class VolumeHud extends View {
         invalidate();
     }
 
-    /** Overlay window params for an accessibility service: top-centre, non-interactive. */
+    /** Overlay window params for an accessibility service: left edge, vertically centred, non-interactive. */
     public WindowManager.LayoutParams params() {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -52,43 +53,50 @@ public class VolumeHud extends View {
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT);
-        lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        lp.y = (int) (46 * d);
+        lp.gravity = Gravity.START | Gravity.CENTER_VERTICAL;
+        lp.x = (int) (56 * d);
         return lp;
     }
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        setMeasuredDimension((int) (440 * d), (int) (54 * d));
+        setMeasuredDimension((int) (52 * d), (int) (256 * d));
     }
 
     @Override
     protected void onDraw(Canvas cv) {
-        float w = getWidth(), h = getHeight();
-        r.set(0, 0, w, h);
-        cv.drawRoundRect(r, h / 2f, h / 2f, bg);
+        float capW = getWidth();
+        float btn = capW;            // speaker button is the same width as the bar (iPhone squircle)
+        float gap = 14 * d;
+        float capH = getHeight() - gap - btn;
 
-        float pad = 22 * d;
-        float ic = 26 * d;
-        float iy = (h - ic) / 2f;
-        Drawable g = muted ? mute : speaker;
-        if (g != null) {
-            g.setBounds((int) pad, (int) iy, (int) (pad + ic), (int) (iy + ic));
-            g.draw(cv);
+        // The track capsule.
+        r.set(0f, 0f, capW, capH);
+        cv.drawRoundRect(r, capW / 2f, capW / 2f, bg);
+
+        // White fill rising from the bottom to the current level, clipped to the capsule.
+        if (!muted && level > 0f) {
+            float fillTop = capH * (1f - level);
+            clip.reset();
+            clip.addRoundRect(r, capW / 2f, capW / 2f, Path.Direction.CW);
+            cv.save();
+            cv.clipPath(clip);
+            cv.drawRect(0f, fillTop, capW, capH, fill);
+            cv.restore();
         }
 
-        float barL = pad + ic + 16 * d;
-        float barR = w - pad;
-        float barH = 8 * d;
-        float barT = (h - barH) / 2f;
-        r.set(barL, barT, barR, barT + barH);
-        cv.drawRoundRect(r, barH / 2f, barH / 2f, track);
-
-        if (!muted && level > 0f) {
-            float end = barL + (barR - barL) * level;
-            if (end < barL + barH) end = barL + barH;   // keep a visible rounded nub at low levels
-            r.set(barL, barT, end, barT + barH);
-            cv.drawRoundRect(r, barH / 2f, barH / 2f, fill);
+        // Speaker glyph in a rounded-square button below the capsule, like iPhone's.
+        float cx = capW / 2f;
+        float top = capH + gap;
+        float rad = 16 * d;
+        r.set(0f, top, capW, top + btn);
+        cv.drawRoundRect(r, rad, rad, bg);
+        Drawable g = muted ? mute : speaker;
+        if (g != null) {
+            float ic = 24 * d;
+            g.setBounds((int) (cx - ic / 2f), (int) (top + (btn - ic) / 2f),
+                    (int) (cx + ic / 2f), (int) (top + (btn + ic) / 2f));
+            g.draw(cv);
         }
     }
 }

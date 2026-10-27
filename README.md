@@ -37,9 +37,11 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 - A **sleep timer** (Off / 15 / 30 / 60 / 90 min) that drops the TV into StandBy when it fires.
 
 **System**
-- **tvOS-style volume HUD** with **press-and-hold** ramping (an accessibility overlay from the
-  launcher, replacing the stock one-step-per-press volume bar).
-- **Aerial video screensaver** — a muted, looping, licence-clean cinematic drone clip.
+- **iPhone-style volume HUD** — a vertical capsule that fills white from the bottom, with a speaker
+  button below, shown by an accessibility overlay with **press-and-hold** ramping (replacing the
+  stock one-step-per-press volume bar).
+- **Aerial video screensaver** — muted, looping, licence-clean drone clips with a soft clock, date
+  and live weather.
 
 ## Layout
 

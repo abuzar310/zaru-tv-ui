@@ -18,8 +18,10 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 - **Sleep timer** — Off / 15 / 30 / 60 / 90 min, fires the host StandBy screen.
 
 ### Added — system
-- **tvOS-style volume HUD** with **press-and-hold** ramping (accessibility overlay).
-- **Aerial video screensaver** — muted, looping, licence-clean cinematic drone clip.
+- **iPhone-style volume HUD** — a vertical capsule that fills white from the bottom with a speaker
+  button below, and **press-and-hold** ramping (accessibility overlay).
+- **Aerial video screensaver** — muted, looping, licence-clean drone clips with a soft clock, date
+  and live weather.
 
 ### Notes
 - All of `tvx-mod` is defensive (`try/catch`) — an effect can only fail to appear, never crash the host.

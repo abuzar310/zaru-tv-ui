@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.service.dreams.DreamService;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
@@ -27,6 +28,14 @@ public class AerialDreamService extends DreamService {
 
     private Uri clipUri(int resId) {
         return Uri.parse("android.resource://" + getPackageName() + "/" + resId);
+    }
+
+    private void showWeather(TextView tv, Weather.Reading r) {
+        if (tv == null || r == null) return;
+        try {
+            tv.setText(Math.round(r.temp) + "°  " + getString(Weather.condition(r.code)));
+            tv.setVisibility(View.VISIBLE);
+        } catch (Throwable ignored) {}
     }
 
     @Override
@@ -64,19 +73,29 @@ public class AerialDreamService extends DreamService {
         try { date.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
         clockBox.addView(time);
         clockBox.addView(date);
-        // Weather, read from the home's cached reading (no network in the dream) — like Apple's aerials.
+        // Weather, like Apple's aerials. Our launcher's cache is usually empty (his launcher is Home,
+        // not ours), so fetch it; if there is a cached reading, show it first.
+        final TextView weather = new TextView(this);
+        weather.setTextColor(0xCCFFFFFF);
+        weather.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        weather.setShadowLayer(12f, 0f, 1f, 0xB3000000);
+        weather.setIncludeFontPadding(false);
+        weather.setPadding(0, (int) (6 * d), 0, 0);
+        weather.setVisibility(View.GONE);
+        try { weather.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
+        clockBox.addView(weather);
         try {
-            Weather.Reading wr = new Weather(this).cached();
-            if (wr != null) {
-                TextView weather = new TextView(this);
-                weather.setText(Math.round(wr.temp) + "°  " + getString(Weather.condition(wr.code)));
-                weather.setTextColor(0xCCFFFFFF);
-                weather.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                weather.setShadowLayer(12f, 0f, 1f, 0xB3000000);
-                weather.setIncludeFontPadding(false);
-                weather.setPadding(0, (int) (6 * d), 0, 0);
-                try { weather.setTypeface(getResources().getFont(R.font.outfit_light)); } catch (Throwable ignored) {}
-                clockBox.addView(weather);
+            String lat = getString(R.string.weather_lat), lon = getString(R.string.weather_lon);
+            if (!lat.isEmpty() && !lon.isEmpty()) {
+                Weather src = new Weather(this, lat, lon);
+                showWeather(weather, src.cached());
+                src.refresh(new Weather.Listener() {
+                    @Override public void onWeather(final Weather.Reading reading) {
+                        weather.post(new Runnable() {
+                            @Override public void run() { showWeather(weather, reading); }
+                        });
+                    }
+                });
             }
         } catch (Throwable ignored) {}
         FrameLayout.LayoutParams clp = new FrameLayout.LayoutParams(
