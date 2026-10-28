@@ -22,7 +22,11 @@ If this is the home you wanted on your TV, a star helps other people find it.
 
 ## Install
 
-JDK 17 and Android SDK platform 34.
+Download the app and the TV steps: **[zaru-tv.vercel.app](https://zaru-tv.vercel.app)**
+
+The file there is **Zaru TV 1.2**, package `com.zaru.tv`. On the TV, install **Downloader** from the Play Store, enter `https://zaru-tv.vercel.app/zaru-tv-1.2.apk`, allow the install, then set **Zaru TV** as the Home app.
+
+To build it yourself: JDK 17 and Android SDK platform 34.
 
 ```bash
 cd launcher
