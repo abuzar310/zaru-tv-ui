@@ -1,8 +1,8 @@
 # tvx-mod — the `com.zaru.tvx` enhancement layer
 
 A tiny, self-contained layer that adds Apple-TV-style motion and a richer Control Center **on top of**
-the tvOS Launcher (`com.sid.tvos`) — without changing its look or removing the author's credit. Used
-**with the developer's permission, for personal use only.**
+a launcher you already have (`com.sid.tvos`). This repo does not include that app. Apply the layer
+only to a copy you have permission to modify, and do not redistribute that app or its decoded code.
 
 Everything here is wrapped in `try/catch`, so a failure can only make an effect quietly not appear —
 the host launcher can never crash because of it.

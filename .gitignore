@@ -1,5 +1,6 @@
 # Build outputs
 build/
+decoded/
 .gradle/
 out/
 tvx-out/

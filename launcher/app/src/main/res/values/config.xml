@@ -206,6 +206,7 @@
         <item>com.spotify.tv.android|Turn it up.</item>
         <item>com.google.android.youtube.tvmusic|Play it loud.</item>
     </string-array>
+    <!-- Weather place for the glass widget. Change the city and the coordinates together. -->
     <string name="weather_city" translatable="false">Chitradurga</string>
     <string name="weather_lat" translatable="false">14.2226</string>
     <string name="weather_lon" translatable="false">76.4004</string>
