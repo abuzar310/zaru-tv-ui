@@ -11,19 +11,19 @@ cd launcher
 
 Output: `launcher/app/build/outputs/apk/debug/app-debug.apk`. Install with `adb install -r <apk>`.
 
-It's an ordinary Android TV app (`com.gathin.tvhome`). Set it as Home and enable its accessibility
+It's an ordinary Android TV app (`com.zaru.tv`). Set it as Home and enable its accessibility
 services if you want the Home-key handling and the volume HUD:
 
 ```
-adb shell settings put secure enabled_accessibility_services com.gathin.tvhome/.HomeKeyService
+adb shell settings put secure enabled_accessibility_services com.zaru.tv/.HomeKeyService
 adb shell settings put secure accessibility_enabled 1
 # Holding a volume button keeps moving the volume (HomeKeyService follows the system key log):
-adb shell pm grant com.gathin.tvhome android.permission.READ_LOGS
+adb shell pm grant com.zaru.tv android.permission.READ_LOGS
 # The gear panel's Now Playing card (Android lists other apps' media only to an allowed listener):
-adb shell cmd notification allow_listener com.gathin.tvhome/com.gathin.tvhome.MediaListener
+adb shell cmd notification allow_listener com.zaru.tv/com.zaru.tv.MediaListener
 ```
 
-Aerial screensaver: `adb shell settings put secure screensaver_components com.gathin.tvhome/.AerialDreamService`.
+Aerial screensaver: `adb shell settings put secure screensaver_components com.zaru.tv/.AerialDreamService`.
 
 ## tvx-mod (`tvx-mod/`)
 

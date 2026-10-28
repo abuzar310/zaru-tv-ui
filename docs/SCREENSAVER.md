@@ -3,7 +3,7 @@
 Two screensavers ship with this project:
 
 - **Aerial** — your own photos StandBy-style plus cinematic drone clips,
-  `com.gathin.tvhome/.AerialDreamService` (the default). See *Your own photos* below.
+  `com.zaru.tv/.AerialDreamService` (the default). See *Your own photos* below.
 - **StandBy clock** — the tvOS-style clock, `com.sid.tvos/.ClockDream`.
 
 ## How to switch
@@ -14,7 +14,7 @@ intent that resolves on this build). So an in-UI toggle isn't reliable here; swi
 
 **Aerial:**
 ```
-adb shell settings put secure screensaver_components com.gathin.tvhome/.AerialDreamService
+adb shell settings put secure screensaver_components com.zaru.tv/.AerialDreamService
 ```
 
 **StandBy clock:**
@@ -38,9 +38,9 @@ and every change dissolves through black. With the folder empty it is the plain 
 The folder belongs to the app, so it needs no storage permission and the photos never leave the TV:
 
 ```
-adb shell mkdir -p /sdcard/Android/data/com.gathin.tvhome/files/screensaver
-adb push our-home.jpg /sdcard/Android/data/com.gathin.tvhome/files/screensaver/01-our-home.jpg
-adb shell chmod 2775 /sdcard/Android/data/com.gathin.tvhome/files/screensaver
+adb shell mkdir -p /sdcard/Android/data/com.zaru.tv/files/screensaver
+adb push our-home.jpg /sdcard/Android/data/com.zaru.tv/files/screensaver/01-our-home.jpg
+adb shell chmod 2775 /sdcard/Android/data/com.zaru.tv/files/screensaver
 ```
 
 Photos play in name order (`01-…`, `02-…`). Use landscape 16:9 pictures, 1920×1080 or larger, with the

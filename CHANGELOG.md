@@ -57,5 +57,4 @@ All notable changes to Zaru TV. Dates are when the feature landed on the real TV
 
 ### Notes
 - All of `tvx-mod` is defensive (`try/catch`) — an effect can only fail to appear, never crash the host.
-- The launcher is a fork of the MIT-licensed cleanyourtv; `tvx-mod` is applied locally, with permission,
-  over the tvOS Launcher and keeps its author's credit.
+- The launcher is `com.zaru.tv`. `tvx-mod` is applied locally over the tvOS Launcher.

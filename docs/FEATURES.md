@@ -53,5 +53,5 @@ A `DreamService` that plays a muted, looping, crop-to-fill cinematic clip
 (`res/raw/aerial_loop.mp4`, Pexels, 720p30 H.264 — gentle on a 1 GB device). The decoder is released when
 the dream detaches. Set it active with:
 ```
-settings put secure screensaver_components com.gathin.tvhome/.AerialDreamService
+settings put secure screensaver_components com.zaru.tv/.AerialDreamService
 ```

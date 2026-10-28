@@ -33,7 +33,7 @@
         android:layout_height="match_parent" />
 
     <!-- E, ambient glow in the focused app's colour. -->
-    <com.gathin.tvhome.GlowView
+    <com.zaru.tv.GlowView
         android:id="@+id/vibeGlow"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

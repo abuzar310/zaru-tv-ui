@@ -3,15 +3,15 @@ plugins {
 }
 
 android {
-    namespace 'com.gathin.tvhome'
+    namespace 'com.zaru.tv'
     compileSdk 34
 
     defaultConfig {
         // Opt-in identity for firmware with a package-name HOME allowlist; see docs/devices/xiaomi-mitv-aetp0-dofus.md.
-        applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
+        applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.zaru.tv')
         minSdk 26
         targetSdk 34
-        // Apple TV Launcher's own numbering, from its 1.0 release (the original CleanYourTV was at 5 / 2.4).
+        // Apple TV Launcher's own numbering, from its 1.0 release (the original Zaru TV was at 5 / 2.4).
         versionCode 12
         versionName '1.2'
     }

@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:background="#C2000000" />
 
-    <com.gathin.tvhome.GlowView
+    <com.zaru.tv.GlowView
         android:id="@+id/deckGlow"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

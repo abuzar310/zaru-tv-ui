@@ -54,7 +54,7 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 
 | Folder | What it is |
 |---|---|
-| [`launcher/`](launcher/) | My fork of the open-source **cleanyourtv** launcher (`com.gathin.tvhome`): the vibe home, show-art backdrops, glass widgets, browse deck, the **volume HUD** (`VolumeHud` + `HomeKeyService`), and the **aerial screensaver** (`AerialDreamService`). Plain Java, `minSdk` 26. |
+| [`launcher/`](launcher/) | The Zaru TV home (`com.zaru.tv`): the vibe home, show-art backdrops, glass widgets, browse deck, the **volume HUD** (`VolumeHud` + `HomeKeyService`), and the **aerial screensaver** (`AerialDreamService`). Plain Java, `minSdk` 26. |
 | [`tvx-mod/`](tvx-mod/) | The **`com.zaru.tvx`** enhancement layer — the living hero, ambient glow, focus engine, Control Center additions and sleep timer. Shipped as a second dex + one hook and applied **locally** over the tvOS Launcher with apktool. See [`tvx-mod/README.md`](tvx-mod/README.md). |
 
 ## Building
@@ -63,16 +63,10 @@ ambient glow that reacts to what's on screen, and an aerial video screensaver.
 - **tvx-mod:** see [`tvx-mod/README.md`](tvx-mod/README.md) — it is applied to a locally-decoded copy
   of the tvOS Launcher, which is **not** included here.
 
-## Credits & licensing
+## Licensing
 
-- **Launcher** is a fork of **[Gathin23/cleanyourtv](https://github.com/Gathin23/cleanyourtv)**
-  (MIT) — see `launcher/` for the upstream licence; my changes are released under the same terms.
-- **`tvx-mod`** enhances the closed-source **tvOS Launcher** (`com.sid.tvos`) by **Siddhant**, used
-  **with the developer's permission, for personal use, keeping his credit, and with no
-  redistribution**. His app's code and APK are deliberately **not** included in this repo — only my
-  own enhancement layer and the recipe to apply it locally.
+- The launcher and `tvx-mod` are Zaru TV, copyright 2026 Abuzar. See `LICENSE`.
+- **`tvx-mod`** is applied locally over the closed-source tvOS Launcher (`com.sid.tvos`). That app
+  is not in this repo.
 - **Aerial clip** (`launcher/app/src/main/res/raw/aerial_loop.mp4`) is from **[Pexels](https://www.pexels.com/)**
   under the free Pexels licence.
-
-Everything I wrote here is mine to keep and build on; the third-party pieces above remain the property
-of their authors.

@@ -50,7 +50,7 @@
 
         <!-- tvOS specular highlight on the focused icon, moved by TvFocusMotion.shine. The card clips it to its
              rounded outline. -->
-        <com.gathin.tvhome.ShineView
+        <com.zaru.tv.ShineView
             android:id="@+id/glare"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

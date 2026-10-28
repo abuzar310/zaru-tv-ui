@@ -16,6 +16,6 @@
         </shape>
     </item>
     <item>
-        <drawable class="com.gathin.tvhome.LiquidGlassDrawable" />
+        <drawable class="com.zaru.tv.LiquidGlassDrawable" />
     </item>
 </selector>

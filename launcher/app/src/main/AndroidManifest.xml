@@ -34,7 +34,7 @@
         </intent>
         <intent>
             <action android:name="android.intent.action.MAIN" />
-            <category android:name="com.gathin.tvhome.category.DOCK_CARD" />
+            <category android:name="com.zaru.tv.category.DOCK_CARD" />
         </intent>
         <!-- China-market MIUI TV firmware: the Settings and Wi-Fi pills fall back to Xiaomi's settings app. -->
         <package android:name="com.xiaomi.mitv.settings" />
@@ -71,7 +71,7 @@
 
         <!-- MainActivity as Home (the classic look). Off while the vibe home is Home: with two Home activities in one
              package this Google TV build kept the old preference whatever set-home-activity said. To switch looks:
-             pm enable com.gathin.tvhome/.HomeClassic; pm disable com.gathin.tvhome/.VibeHomeActivity (and back). -->
+             pm enable com.zaru.tv/.HomeClassic; pm disable com.zaru.tv/.VibeHomeActivity (and back). -->
         <activity-alias
             android:name=".HomeClassic"
             android:targetActivity=".MainActivity"
@@ -86,12 +86,12 @@
 
         <!-- The vibe home: white logos, taglines and a glow over black-and-white show art. A Home of its own, in its
              own task, so Home always lands here while MainActivity opens on top as "all apps". Pick it with
-             cmd package set-home-activity com.gathin.tvhome/.VibeHomeActivity. -->
+             cmd package set-home-activity com.zaru.tv/.VibeHomeActivity. -->
         <activity
             android:name=".VibeHomeActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:taskAffinity="com.gathin.tvhome.vibe"
+            android:taskAffinity="com.zaru.tv.vibe"
             android:stateNotNeeded="true"
             android:excludeFromRecents="true"
             android:clearTaskOnLaunch="true"
@@ -109,7 +109,7 @@
         <activity
             android:name=".BrowseDeckActivity"
             android:exported="false"
-            android:taskAffinity="com.gathin.tvhome.vibe"
+            android:taskAffinity="com.zaru.tv.vibe"
             android:excludeFromRecents="true"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden|uiMode"
             android:screenOrientation="landscape" />
@@ -151,7 +151,7 @@
         </service>
 
         <!-- Screensaver: pick it in Settings, or `settings put secure screensaver_components
-             com.gathin.tvhome/.ClockDream` over adb. -->
+             com.zaru.tv/.ClockDream` over adb. -->
         <service
             android:name=".ClockDream"
             android:label="@string/dream_name"
@@ -164,7 +164,7 @@
         </service>
 
         <!-- Apple aerials screensaver (AerialDream): `settings put secure screensaver_components
-             com.gathin.tvhome/.AerialDream`. -->
+             com.zaru.tv/.AerialDream`. -->
         <service
             android:name=".AerialDream"
             android:label="@string/aerial_dream_name"
@@ -178,7 +178,7 @@
 
         <!-- Aerial screensaver with a bundled, licence-clean CC0 loop (res/raw/aerial_loop.mp4), no
              external files needed: `settings put secure screensaver_components
-             com.gathin.tvhome/.AerialDreamService`. -->
+             com.zaru.tv/.AerialDreamService`. -->
         <service
             android:name=".AerialDreamService"
             android:label="@string/aerial_dream_name"
@@ -215,7 +215,7 @@
         </service>
 
         <!-- Control Center's Now Playing: Android lists other apps' media sessions only to an allowed notification
-             listener. `cmd notification allow_listener com.gathin.tvhome/com.gathin.tvhome.MediaListener`. -->
+             listener. `cmd notification allow_listener com.zaru.tv/com.zaru.tv.MediaListener`. -->
         <service
             android:name=".MediaListener"
             android:exported="true"

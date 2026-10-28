@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Home</string>
+    <string name="app_name">Zaru TV</string>
     <string name="inputs">Inputs</string>
     <string name="clock_panel">Clock</string>
     <string name="wifi">Wi-Fi</string>
@@ -22,7 +22,7 @@
     <string name="top_buttons">Top icons</string>
     <string name="menu_tv_settings">TV settings</string>
     <string name="menu_sleep">Sleep</string>
-    <string name="sleep_unavailable">Sleep needs the CleanYourTV sleep service: turn it on in Settings > Accessibility</string>
+    <string name="sleep_unavailable">Sleep needs the Zaru TV sleep service: turn it on in Settings > Accessibility</string>
     <string name="sleep_service_name">Sleep</string>
     <string name="sleep_service_description">Lets the Home screen\'s Settings menu put the TV to sleep.</string>
     <string name="sounds">Sounds</string>
@@ -61,7 +61,7 @@
     <string name="vpn">VPN</string>
     <string name="vpn_off">VPN off</string>
     <string name="home_settings">Choose default home</string>
-    <string name="home_settings_help">Select your original home to stop using CleanYourTV as Home, or CleanYourTV to switch back. The original launcher must be enabled and your TV must provide a home picker; use the restore script first if it was disabled.</string>
+    <string name="home_settings_help">Select your original home to stop using Zaru TV as Home, or Zaru TV to switch back. The original launcher must be enabled and your TV must provide a home picker; use the restore script first if it was disabled.</string>
     <string name="launcher_settings">Launcher settings</string>
     <string name="columns_label">Apps per row</string>
     <string name="rows_below_dock_label">Rows below dock</string>

@@ -55,8 +55,8 @@ final class CcExtras {
                             // The launcher's volume HUD follows every volume change; tell it this one is the
                             // slider, so it does not pop up over the Control Center while you drag.
                             try {
-                                s.getContext().sendBroadcast(new Intent("com.gathin.tvhome.VOLUME_HUD_QUIET")
-                                        .setPackage("com.gathin.tvhome"));
+                                s.getContext().sendBroadcast(new Intent("com.zaru.tv.VOLUME_HUD_QUIET")
+                                        .setPackage("com.zaru.tv"));
                             } catch (Throwable ignored) {}
                             try { am.setStreamVolume(AudioManager.STREAM_MUSIC, Math.max(0, Math.min(max, p)), 0); }
                             catch (Throwable ignored) {}
