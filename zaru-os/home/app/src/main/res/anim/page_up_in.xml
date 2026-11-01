@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Page scroll down to the next page: it rises from below, 380ms, decelerate(2.2). -->
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromYDelta="100%"
+    android:toYDelta="0%"
+    android:duration="380"
+    android:interpolator="@anim/decelerate_22" />

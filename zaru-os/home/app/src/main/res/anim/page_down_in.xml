@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Back up to the page above: it settles down from a quarter above. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="380"
+    android:interpolator="@anim/decelerate_22">
+    <translate android:fromYDelta="-25%" android:toYDelta="0%" />
+    <alpha android:fromAlpha="0.4" android:toAlpha="1" />
+</set>

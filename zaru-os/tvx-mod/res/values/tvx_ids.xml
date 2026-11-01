@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="tvxVolRow"/>
+    <item type="id" name="tvxVol"/>
+    <item type="id" name="tvxVolPct"/>
+    <item type="id" name="tvxNowRow"/>
+    <item type="id" name="tvxNowTitle"/>
+    <item type="id" name="tvxNowArtist"/>
+    <item type="id" name="tvxNowIcon"/>
+    <item type="id" name="tvxSleepRow"/>
+    <item type="id" name="tvxSleepIcon"/>
+    <item type="id" name="tvxSleepTitle"/>
+    <item type="id" name="tvxSleepValue"/>
+</resources>
